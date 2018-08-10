@@ -1,0 +1,242 @@
+---
+title: "Wine dataset notebook to find wine groups"
+output: html_notebook
+---
+
+# Loading Wine datasets
+
+```{r}
+set.seed(42)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(readr)
+library(fpc)
+library(data.table)
+library(ggplot2)
+```
+
+## Datasets description
+
+```
+For more information, read [Cortez et al., 2009]. 
+Input variables (based on physicochemical tests): 
+
+1 - fixed acidity        (FA)
+2 - volatile acidity     (VA)
+3 - citric acid          (CA)
+4 - residual sugar       (RS)
+5 - chlorides            (CH)
+6 - free sulfur dioxide  (FSD)
+7 - total sulfur dioxide (TSD)
+8 - density              (DEN)
+9 - pH                   (pH)
+10 - sulphates           (SUL)
+11 - alcohol             (ALC) 
+
+Output variable (based on sensory data): 
+12 - quality (score between 0 and 10) - (QLT)
+```
+Volatile acidity refers to the steam distillable acids present in wine, primarily acetic acid but also lactic, formic, butyric, and propionic acids. Commonly, these acids are measured by Cash Still, though now they can be measured by gas chromatography, HPLC or enzymatic methods.
+
+Sulphur dioxide (SO2) is the most widely used and controversial additive in winemaking. Its main functions are to inhibit or kill unwanted yeasts and bacteria, and to protect wine from oxidation.
+
+In wine tasting, the term “acidity” refers to the fresh, tart and sour attributes of the wine which are evaluated in relation to how well the acidity balances out the sweetness and bitter components of the wine such as tannins. Three primary acids are found in wine grapes: tartaric, malic and citric acids
+
+Sulfates aren't involved in wine production, but some beer makers use calcium sulfate—also known as brewers' gypsum—to correct mineral deficiencies in water during the brewing process. Sulfites are naturally occurring compounds found in all wines; they act as a preservative by inhibiting microbial growth.
+
+Red wines from different countries have been assessed in order to determine the influence of terroir and grape variety in their concentration of chloride. [Ref](http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-20612015000100095)
+
+## Reading red wines dataset
+
+```{r}
+wines_red_data <- 
+  read.csv(
+    "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv",
+    sep=";", 
+    header = TRUE, 
+    col.names = c("FA","VA","CA","RS","CH","FSD","TSD","DEN","pH","SUL","ALC","QLT"))
+wines_red_data$TYPE <- 0
+```
+
+
+## Reading white wines dataset
+
+```{r}
+wines_white_data <- 
+  read.csv(
+    "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv",
+    sep=";", 
+    header = TRUE, 
+    col.names = c("FA","VA","CA","RS","CH","FSD","TSD","DEN","pH","SUL","ALC","QLT"))
+wines_white_data$TYPE <- 1
+```
+
+
+## Combining the datasets
+```{r}
+wines_data <- rbind(wines_red_data, wines_white_data)
+#summary(wines_data)
+
+```
+
+# Feature reduction
+```{r}
+wines_data_sm <- wines_data[c("RS","pH","DEN","ALC","QLT","TYPE")]
+```
+
+
+
+# Clustering
+## Wines dataset normalizing
+
+Normalizing red whine dataset in preparation to clustering
+```{r}
+wines_data_sm.std <- scale(wines_data_sm[1:4])
+head(wines_data_sm.std)
+```
+
+
+```{r}
+#A fundamental question is how to determine the value of the parameter k. 
+#If we looks at the percentage of variance explained as a function of the number of clusters: 
+#One should choose a number of clusters so that adding another cluster doesnât give much better 
+#modeling of the data. More precisely, if one plots the percentage of variance explained by the 
+#clusters against the number of clusters, the first clusters will add much information 
+#(explain a lot of variance), but at some point the marginal gain will drop, 
+#giving an angle in the graph. The number of clusters is chosen at this point, hence the âelbow criterionâ.
+
+wssplot <- function(data, nc=15, seed=1234){
+  wss <- (nrow(data)-1)*sum(apply(data,2,var))
+  for (i in 2:nc){
+    set.seed(seed)
+    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
+  plot(1:nc, wss, type="b", xlab="Number of Clusters",
+       ylab="Within groups sum of squares")}
+
+wssplot(wines_data_sm.std, nc=10) 
+```
+
+## Red wine dataset clustering K-means
+```{r  fig.height=10, fig.width=10}
+clusters_num = 4
+k.means.fit <- kmeans(wines_data_sm.std, clusters_num,iter.max = 1000)
+# attributes(k.means.fit)
+k.means.fit$centers
+# plot(k.means.fit$centers[,c("RS","ALC")])
+# k.means.fit$cluster
+k.means.fit$size
+pairs(~ALC+RS+pH+DEN, data=k.means.fit$centers)
+
+```
+
+```{r fig.height=10, fig.width=10}
+library(cluster)
+clusplot(wines_data_sm.std, k.means.fit$cluster, main='2D representation of the Cluster solution',
+         color=TRUE, shade=FALSE,
+         labels=clusters_num, lines=2)
+```
+
+## In order to evaluate the clustering performance we build a confusion matrix:
+
+```{r}
+table(wines_data[,13],k.means.fit$cluster)
+```
+
+```{r}
+table(wines_data[,12],k.means.fit$cluster)
+```
+
+# Hierarchical Clustering
+
+```{r}
+#Hierarchical clustering:
+#Hierarchical methods use a distance matrix as an input for the clustering algorithm. 
+#The choice of an appropriate metric will influence the shape of the clusters, as some element
+#may be close to one another according to one distance and farther away according to another.
+
+d <- dist(wines_data.std, method = "euclidean") # Euclidean distance matrix.
+#We use the Euclidean distance as an input for the clustering algorithm 
+#(Wardâs minimum variance criterion minimizes the total within-cluster variance):
+  
+H.fit <- hclust(d, method="ward.D2")
+
+#The clustering output can be displayed in a dendrogram
+
+plot(H.fit) # display dendogram
+groups <- cutree(H.fit, k=clusters_num) # cut tree into 3 clusters
+
+# draw dendogram with red borders around the 3 clusters
+rect.hclust(H.fit, k=clusters_num, border="red") 
+
+#The clustering performance can be evaluated with the aid of a confusion matrix as follows:
+  
+table(wines_data[,13],groups)
+```
+# Check RF Prediction for each cluster
+
+# Cluster 1
+
+```{r message=FALSE, warning=FALSE}
+library(caret)
+#cluster1 <- wines_data[k.means.fit$cluster == 2,1:12]
+cluster1 <- wines_data[,1:12]
+train1.rows<- createDataPartition(y= cluster1$QLT, p=0.7, list = FALSE)
+train1.data<- cluster1[train1.rows,]
+prop.table((table(train1.data$QLT)))
+```
+
+```{r}
+test1.data<- cluster1[-train1.rows,]
+prop.table((table(test1.data$QLT)))
+```
+```{r message=FALSE, warning=FALSE}
+library(randomForest)
+fitRF1 <- randomForest(
+  QLT ~ ., method="anova",
+  data=train1.data, importance=TRUE, ntree=1000)
+```
+
+```{r forimp, fig.width=4, fig.height=6, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Importance of the dataset attributes for the prediction of the 'class' attribute"}
+varImpPlot(fitRF1, main="")
+```
+```{r}
+PredictionRF1 <- predict(fitRF1, test1.data)
+cor(PredictionRF1,test1.data$QLT)
+table(round(PredictionRF1),test1.data$QLT)
+```
+```{r plot_rf_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Random Forest Prediction"}
+library(ggplot2)
+df2 = data.frame(as.factor(test1.data$QLT), PredictionRF1)
+colnames(df2) <- c("Test","Prediction")
+ggplot(df2, aes(x = Test, y = Prediction)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
+```
+
+# Support Vector Machine Clasification
+
+## Create SVM Model and show summary
+```{r}
+library("e1071")
+svm_model <- svm(QLT ~ ., data=train1.data)
+summary(svm_model)
+```
+
+## Run Prediction
+```{r}
+predSVM <- predict(svm_model, test1.data)
+cor(predSVM,test1.data$QLT)
+table(round(predSVM),test1.data$QLT)
+```
+
+```{r plot_rf_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
+library(ggplot2)
+df2 = data.frame(as.factor(test1.data$QLT), predSVM)
+colnames(df2) <- c("Test","Prediction")
+ggplot(df2, aes(x = Test, y = Prediction)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
+```
+
+

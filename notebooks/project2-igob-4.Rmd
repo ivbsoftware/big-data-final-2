@@ -1,0 +1,279 @@
+---
+title: "News Popularity Prediction"
+output: html_notebook
+---
+
+# Loading the dataset
+
+```{r message=FALSE, warning=FALSE}
+set.seed(42)
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(readr)
+library(fpc)
+library(data.table)
+library(ggplot2)
+library(dataPreparation)
+```
+
+## Datasets description
+
+[Dataset description](http://archive.ics.uci.edu/ml/datasets/Online+News+Popularity#)
+
+## Reading the dataset
+
+```{r}
+news_data_full <- read.csv("../data/OnlineNewsPopularity.csv", header = TRUE)[,3:61]
+#summary(news_data_full)
+```
+# Data exploration
+
+## Check for missing values
+The dataset has no missing values. Code below calculate number of rows with missing values and checks if there is at list one.
+
+```{r}
+any(is.na(news_data_full))
+```
+
+## Filter useless variables
+
+The first thing to do, in order to make computation fast, would be to filter useless variables:
+
+ * Constant variables
+ * Variables that are in double (for example col1 == col2)
+ * Variables that are exact bijections (for example col1 = A, B, B, A and col2 = 1, 2, 2, 1)
+
+```{r message=FALSE, warning=FALSE}
+library(dataPreparation)
+constant_cols <- whichAreConstant(news_data_full)
+double_cols <- whichAreInDouble(news_data_full)
+bijections_cols <- whichAreBijection(news_data_full)
+```
+
+
+## Distribution of target value in the dataset
+As we mentioned before, the target value QLT of the wine quality is not equally distributed. The Figure \ref{fig:hist_qlt_rw} demonstrates the distribution. As we can see, dataset covers mostly medium-quality wines with QLT between 5 and 7 well, low and high  quality wines represented poorly.
+
+```{r hist_qlt_rw, fig.height=3, fig.width=6, fig.align="center", fig.cap="Distribution of Wine Quality Attribute"}
+
+ggplot(news_data_full, aes(x=shares))  + geom_density()
+```
+
+
+```{r hist_qlt1_rw, fig.height=3, fig.width=6, fig.align="center", fig.cap="Distribution of Wine Quality Attribute"}
+
+ggplot(news_data_full, aes(x=shares))  + geom_density() + scale_x_continuous(trans = 'log10')
+```
+
+```{r hist_qlt_rw, fig.align="center", fig.cap="Distribution", fig.height=3, fig.width=6, message=FALSE, warning=FALSE}
+
+ggplot(news_data_full, aes(x=shares))  + geom_density() + xlim(c(0, 10000))
+```
+
+
+## Discretization of target value
+```{r}
+news_data_full$shares_bins = news_data_full$shares
+news_data_full <- fastDiscretization(dataSet = news_data_full, 
+  bins = list(shares_bins = c(0, 500, 1000, 2000, 3000, 4000, 5000, 7500, 10000, 25000, 50000, 100000, 1000000, +Inf)))
+print(table(news_data_full$shares_bins))
+```
+
+## Discretization of target value by bins with equal frequency
+```{r}
+news_data_full$shares_bins_eqf = news_data_full$shares
+bins <- build_bins(dataSet = news_data_full, cols = "shares_bins_eqf", n_bins = 12, type = "equal_freq")
+print(bins)
+```
+```{r}
+news_data_full <- fastDiscretization(dataSet = news_data_full, bins = bins)
+print(table(news_data_full$shares_bins_eqf))
+```
+
+
+## Scale
+Most machine learning algorithm rather handle scaled data instead of unscaled data. To perform scaling (meaning setting mean to 0 and standard deviation to 1), function fastScale is available. Since it is highly recommended to apply same scaling on train and test, you should compute the scales first using the function build_scales
+
+```{r}
+news_data_full$shares_bins_norm = news_data_full$shares
+scales <- build_scales(dataSet = news_data_full, cols = c("shares_bins_norm"), verbose = TRUE)
+print (scales)
+
+news_data_full <- fastScale(dataSet = news_data_full, scales = scales, verbose = TRUE)
+summary(news_data_full$shares_bins_norm)
+```
+```{r hist_qlt2_rw, echo=FALSE, fig.align="center", fig.cap="Distribution"", fig.height=3, fig.width=6, message=FALSE, warning=FALSE}
+
+ggplot(news_data_full, aes(x=shares_bins_norm))  + geom_density() + xlim(c(-1, 1))
+```
+
+
+
+
+
+
+## Use smaller subset for research
+```{r message=FALSE, warning=FALSE}
+library(caret)
+news_data.rows<- createDataPartition(y= news_data_full$shares_bins_norm, p=0.5, list = FALSE)
+news_data<- news_data_full[news_data.rows,]
+```
+
+## Stepwise Regression
+Stepwise Regression method starts with the full model and eliminates predictors one at a time, at each step considering whether the criterion will be improved. As we see from the algorithm output, the new  model is identical to the one found the previous section manually.
+
+```{r message=FALSE, warning=FALSE}
+library(MASS)
+fit <- lm(shares_bins_norm ~ . -shares - shares_bins - shares_bins_eqf, data=news_data)
+step <- stepAIC(fit, direction="both", trace = FALSE)
+step$anova
+
+```
+
+```{r}
+summary(step$anova)
+```
+
+## Evaluating the model
+
+```{r}
+news_data.fit1 <- lm (shares_bins_norm ~ n_non_stop_unique_tokens + num_hrefs + average_token_length + 
+    data_channel_is_bus + kw_max_min + kw_max_max + kw_avg_avg + 
+    self_reference_min_shares + weekday_is_monday + min_negative_polarity + 
+    max_negative_polarity,
+    data=news_data)
+fit1.sum <- summary(news_data.fit1)
+fit1.sum
+```
+
+
+# Check default Regression Tree prediction
+
+
+# Check RF Prediction
+
+```{r message=FALSE, warning=FALSE}
+library(caret)
+train1.rows<- createDataPartition(y= news_data$shares_bins, p=0.7, list = FALSE)
+train1.data<- news_data[train1.rows,]
+```
+```{r message=FALSE, warning=FALSE}
+attach(train1.data)
+```
+
+```{r}
+test1.data<- news_data[-train1.rows,]
+```
+```{r message=FALSE, warning=FALSE}
+library(randomForest)
+fitRF1 <- randomForest(
+  shares_bins ~ . -shares - shares_bins_eqf - shares_bins_norm, 
+  method="class",
+  data=train1.data, importance=TRUE, ntree=500)
+```
+
+```{r forimp, fig.width=10, fig.height=10, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Importance of the dataset attributes for the prediction of the 'class' attribute"}
+varImpPlot(fitRF1, main="")
+```
+```{r}
+PredictionRF1 <- predict(fitRF1, test1.data, type = "class")
+#cor(PredictionRF1,test1.data$shares_bins_eqf)
+confMat <- table(PredictionRF1,test1.data$shares_bins)
+confMat
+accuracy <- sum(diag(confMat))/sum(confMat)
+cat(sprintf("\nAccuracy=%f", accuracy))
+```
+
+
+```{r plot_rf_rw, fig.width=10, fig.height=10, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Random Forest Prediction"}
+library(ggplot2)
+df2 = data.frame(test1.data$shares_bins_norm, PredictionRF1)
+colnames(df2) <- c("Test","Prediction")
+#plot(df2)  + xlim(c(-1, 1))
+ggplot(df2, aes(x="Test", y="Prediction"))  + xlim(c(-1, 1))
+```
+
+
+
+
+
+# Clustering
+## Wines dataset normalizing
+
+Normalizing red whine dataset in preparation to clustering
+```{r}
+news_data.std <- scale(news_data[,1:58])
+head(news_data.std)
+```
+
+
+```{r}
+#A fundamental question is how to determine the value of the parameter k. 
+#If we looks at the percentage of variance explained as a function of the number of clusters: 
+#One should choose a number of clusters so that adding another cluster doesnât give much better 
+#modeling of the data. More precisely, if one plots the percentage of variance explained by the 
+#clusters against the number of clusters, the first clusters will add much information 
+#(explain a lot of variance), but at some point the marginal gain will drop, 
+#giving an angle in the graph. The number of clusters is chosen at this point, hence the âelbow criterionâ.
+
+wssplot <- function(data, nc=20, seed=1234){
+  wss <- (nrow(data)-1)*sum(apply(data,2,var))
+  for (i in 2:nc){
+    set.seed(seed)
+    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
+  plot(1:nc, wss, type="b", xlab="Number of Clusters",
+       ylab="Within groups sum of squares")}
+
+wssplot(news_data.std, nc=20) 
+```
+
+## Dataset clustering K-means
+```{r  fig.height=10, fig.width=10}
+clusters_num = 2
+k.means.fit <- kmeans(news_data.std, clusters_num)
+# attributes(k.means.fit)
+# k.means.fit$centers
+# plot(k.means.fit$centers[,c("RS","ALC")])
+# k.means.fit$cluster
+k.means.fit$size
+#pairs(~ALC+RS+pH+DEN, data=k.means.fit$centers)
+```
+
+```{r fig.height=10, fig.width=10}
+library(cluster)
+clusplot(news_data.std, k.means.fit$cluster, main='2D representation of the Cluster solution',
+         color=TRUE, shade=TRUE,
+         labels=clusters_num, lines=0)
+```
+``
+
+
+
+
+# Support Vector Machine Clasification
+
+## Create SVM Model and show summary
+```{r}
+library("e1071")
+svm_model <- svm(QLT ~ ., data=train1.data)
+summary(svm_model)
+```
+
+## Run Prediction
+```{r}
+predSVM <- predict(svm_model, test1.data)
+cor(predSVM,test1.data$QLT)
+table(round(predSVM),test1.data$QLT)
+```
+
+```{r plot_rf_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
+library(ggplot2)
+df2 = data.frame(as.factor(test1.data$QLT), predSVM)
+colnames(df2) <- c("Test","Prediction")
+ggplot(df2, aes(x = Test, y = Prediction)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
+```
+
+
