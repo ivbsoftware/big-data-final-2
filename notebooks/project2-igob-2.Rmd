@@ -108,7 +108,7 @@ wssplot <- function(data, nc=15, seed=1234){
   plot(1:nc, wss, type="b", xlab="Number of Clusters",
        ylab="Within groups sum of squares")}
 
-wssplot(wines_data.std, nc=10) 
+wssplot(wines_data.std, nc=5) 
 ```
 
 ## Red wine dataset clustering K-means
@@ -224,7 +224,7 @@ cor(predSVM,test1.data$QLT)
 table(round(predSVM),test1.data$QLT)
 ```
 
-```{r plot_rf_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
+```{r plot_rf1_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
 library(ggplot2)
 df2 = data.frame(as.factor(test1.data$QLT), predSVM)
 colnames(df2) <- c("Test","Prediction")

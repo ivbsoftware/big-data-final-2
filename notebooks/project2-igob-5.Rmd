@@ -120,7 +120,7 @@ ggplot(news_data_full, aes(x=shares_bins_norm))  + geom_density() + xlim(c(-1, 1
 ## Use smaller subset for research
 ```{r message=FALSE, warning=FALSE}
 library(caret)
-news_data.rows<- createDataPartition(y= news_data_full$shares_bins_norm, p=0.99, list = FALSE)
+news_data.rows<- createDataPartition(y= news_data_full$shares_bins_norm, p=0.3, list = FALSE)
 news_data<- news_data_full[news_data.rows,]
 ```
 
@@ -359,9 +359,9 @@ k.means.fit$size
 
 ```{r fig.height=10, fig.width=10, fig.cap="2D representation of the Cluster solution"}
 library(cluster)
-clusplot(news_data.std, k.means.fit$cluster, main="",
-         color=TRUE, shade=TRUE,
-         labels=clusters_num, lines=0)
+#clusplot(news_data.std, k.means.fit$cluster, main="",
+#         color=TRUE, shade=TRUE,
+#         labels=clusters_num, lines=0)
 ```
 
 
@@ -413,6 +413,7 @@ cat(sprintf("\nAccuracy=%f", accuracy))
 
 ## Preparing scaled data
 ```{r}
+set.seed(4231)
 data <- news_data[,1:59]
 index <- sample(1:nrow(data),round(0.75*nrow(data)))
 #index <- createDataPartition(y= data$shares, p=0.75, list = FALSE)
@@ -428,11 +429,12 @@ test_ <- scaled[-index,]
 library(neuralnet)
 n <- names(train_)
 f <- as.formula(paste("shares ~", paste(n[!n %in% "shares"], collapse = " + ")))
-nn <- neuralnet(f,data=train_,hidden=c(5,3),linear.output=T)
+nn <- neuralnet(f,data=train_,hidden=c(10,5,3),linear.output=F)
+
 ```
 
-```{r plot_nn, fig.height=10, fig.width=10, message=FALSE, warning=FALSE, fig.cap="Graphical representation of the NN model with the weights on each connection:"}
-plot(nn)
+```{r plot_nn, fig.height=10, fig.width=25, message=FALSE, warning=FALSE, fig.cap="Graphical representation of the NN model with the weights on each connection:"}
+#plot(nn)
 ```
 
 ## Predicting shares using the neural network
@@ -444,12 +446,17 @@ pr.nn <- compute(nn,test_[,1:58])
 pr.nn_ <- pr.nn$net.result*(max(data$shares)-min(data$shares))+min(data$shares)
 test.r <- (test_$shares)*(max(data$shares)-min(data$shares))+min(data$shares)
 #MSE.nn <- sum((test.r - pr.nn_)^2)/nrow(test_)
-cor(pr.nn_, test.r)
+cor(test.r,pr.nn_)
+#cor(pr.nn$net.result,test_$shares)
 ```
 
 ```{r}
+par(mfrow=c(1,2))
+
 plot(test.r,pr.nn_, col='red',main='Real vs predicted NN',pch=18,cex=0.7)
 abline(0,1,lwd=2)
 legend('bottomright',legend='NN',pch=18,col='red', bty='n')
-```
 
+plot(test.r,pr.nn_, col='red',main='Real vs predicted NN',pch=18,cex=0.7, xlim = c(0,20000))
+legend('bottomright',legend='NN',pch=18,col='red', bty='n')
+```
