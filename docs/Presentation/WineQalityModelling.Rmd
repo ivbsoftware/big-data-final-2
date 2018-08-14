@@ -9,11 +9,146 @@ output: beamer_presentation
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## R Markdown
+## Wines Dataset Attributes
 
-This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```
+Input variables (based on physicochemical tests): 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+1 - fixed acidity        (FA)
+2 - volatile acidity     (VA)
+3 - citric acid          (CA)
+4 - residual sugar       (RS)
+5 - chlorides            (CH)
+6 - free sulfur dioxide  (FSD)
+7 - total sulfur dioxide (TSD)
+8 - density              (DEN)
+9 - pH                   (pH)
+10 - sulphates           (SUL)
+11 - alcohol             (ALC) 
+
+Output variable (based on sensory data): 
+12 - quality (score between 0 and 10) - (QLT)
+```
+
+## Wines Quality Dataset - first rows
+```{r message=FALSE, warning=FALSE, include=FALSE}
+wines_red_data <- 
+  read.csv(
+    "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv",
+    sep=";", 
+    header = TRUE, 
+    col.names = c("FA","VA","CA","RS","CH","FSD","TSD","DEN","pH","SUL","ALC","QLT"))
+wines_red_data$TYPE <- 0
+
+wines_white_data <- 
+  read.csv(
+    "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv",
+    sep=";", 
+    header = TRUE, 
+    col.names = c("FA","VA","CA","RS","CH","FSD","TSD","DEN","pH","SUL","ALC","QLT"))
+wines_white_data$TYPE <- 1
+wines_data <- rbind(wines_red_data, wines_white_data)
+```
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+library(xtable)
+options(xtable.floating = TRUE)
+options(xtable.timestamp = "")
+options(xtable.comment = FALSE)
+print(xtable(head(wines_data, n = 20)), scalebox=.6)
+```
+
+## Dataset attributes summary
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+print(xtable(summary(wines_data[,1:6])), include.rownames = FALSE, scalebox=.6)
+print(xtable(summary(wines_data[,7:12])),include.rownames = FALSE, scalebox=.6)
+```
+
+## Distribution of target value in the dataset
+
+```{r fig.height=4, fig.width=6}
+library(ggplot2)
+ggplot(data = wines_data, mapping = aes(x = QLT)) + geom_bar()
+```
+
+## Random Forests Regressor Modeling
+
+```{r warning=TRUE, include=FALSE}
+library(caret)
+cluster1 <- wines_data[,1:12]
+train1.rows<- createDataPartition(y= cluster1$QLT, p=0.7, list = FALSE)
+train1.data<- cluster1[train1.rows,]
+test1.data<- cluster1[-train1.rows,]
+print (prop.table((table(train1.data$QLT))), scalebox=.6)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(randomForest)
+fitRF1 <- randomForest(
+  QLT ~ ., method="anova",
+  data=train1.data, importance=TRUE, ntree=500)
+
+PredictionRF1 <- predict(fitRF1, test1.data)
+
+cor(PredictionRF1,test1.data$QLT)
+```
+
+## Importance of the dataset attributes for QLT prediction
+```{r fig.width=6, fig.height=5}
+varImpPlot(fitRF1, main="")
+```
+
+## Random Forest Pledictor Confusion Matrix
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+xtable(table(round(PredictionRF1),test1.data$QLT))
+```
+
+## Random Forest Prediction scatter plot
+
+```{r plot_rf_rw, fig.width=8, fig.height=5, message=FALSE, warning=FALSE}
+library(ggplot2)
+df2 = data.frame(as.factor(test1.data$QLT), PredictionRF1)
+colnames(df2) <- c("Test","Prediction")
+ggplot(df2, aes(x = Test, y = Prediction)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
+```
+
+## SVM Model and summary
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library("e1071")
+svm_model <- svm(QLT ~ ., data=train1.data)
+summary(svm_model)
+```
+
+## SVM Prediction
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+predSVM <- predict(svm_model, test1.data)
+cor(predSVM,test1.data$QLT)
+```
+
+## SVM Pledictor Confusion Matrix
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+xtable(table(round(predSVM),test1.data$QLT))
+```
+
+## SVM Prediction scatter plot
+
+```{r plot_rf1_rw, fig.width=8, fig.height=5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE}
+library(ggplot2)
+df2 = data.frame(as.factor(test1.data$QLT), predSVM)
+colnames(df2) <- c("Test","Prediction")
+ggplot(df2, aes(x = Test, y = Prediction)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
+```
+
+## Neural Network Model
+
+```{r fig.align = "center", out.width = "1\\textwidth"}
+knitr::include_graphics("images/nn_lg.png")
+```
 
 ## Slide with Bullets
 
@@ -21,15 +156,4 @@ When you click the **Knit** button a document will be generated that includes bo
 - Bullet 2
 - Bullet 3
 
-## Slide with R Output
-
-```{r cars, echo = TRUE}
-summary(cars)
-```
-
-## Slide with Plot
-
-```{r pressure}
-plot(pressure)
-```
 
