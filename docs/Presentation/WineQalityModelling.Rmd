@@ -369,3 +369,16 @@ knitr::include_graphics("images/vinhoverde-bottles.jpg")
 ```{r fig.align = "center", out.width = ".8\\textwidth"}
 knitr::include_graphics("images/Robot3.PNG")
 ```
+
+## Note
+
+```
+This slideshow was generated in R Studio using 
+Beamer Knit template. The file itself is an 
+executable R Markdown file that could be
+downloaded from  Github with all the 
+necessary artifacts:
+
+https://github.com/ivbsoftware/big-data-final-2
+
+```
