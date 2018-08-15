@@ -282,7 +282,7 @@ clusplot(wines_data.std, k.means.fit$cluster, main='',
 xtable(table(wines_data[,12],k.means.fit$cluster))
 ```
 
-## Cluster Analysis K-Means - Wine Type is Correlated to Clusters!
+## Wine Type is Correlated to Clusters!
 
 
 ```{r results='asis'}
