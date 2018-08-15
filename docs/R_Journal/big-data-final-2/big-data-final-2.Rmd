@@ -88,7 +88,13 @@ Output variable (based on sensory data):
 12 - quality (score between 0 and 10) - (QLT)
 ```
 
-Volatile acidity refers to the steam distillable acids present in wine, primarily acetic acid but also lactic, formic, butyric, and propionic acids. Commonly, these acids are measured by Cash Still, though now they can be measured by gas chromatography, HPLC or enzymatic methods.
+[Wines by Taste](https://www.primermagazine.com/2011/learn/an-easy-explanation-of-wine-types)
+
+https://winefolly.com/tutorial/weird-wine-flavors-and-the-science-behind-them/
+
+VA intensifies the taste of
+the other acids and tannins (https://www.awri.com.au/wp-content/uploads/2018/03/s1982.pdf)
+As the name suggests, volatile acidity (VA) is referencing volatility in wine, which causes it to go bad. Acetic acid builds up in wine when there’s too much exposure to oxygen during winemaking and is usually caused by acetobacter (the vinegar-making bacteria!). Volatile acidity is considered a fault at higher levels (1.4 g/L in red and 1.2 g/L in white) and can smell sharp like nail polish remover. But at lower levels, it can add fruity-smelling raspberry, passion fruit, or cherry-like flavors. Wines that have long fermentations (1 month or more), such as Amarone della Valpolicella, Ice Wine, and Barolo generally accumulate higher levels of volatile acidity.
 
 Sulphur dioxide (SO2) is the most widely used and controversial additive in winemaking. Its main functions are to inhibit or kill unwanted yeasts and bacteria, and to protect wine from oxidation. Important concentrations of SO2 can affect the smell of the wine. It is also most-often noted on the finish, with some wines displaying a strong flavor of Sulphur after you've tasted (or swallowed) on the back of the mouth. Red wine contains less Sulphur Dioxide than white and ros? as the above regulations show. Generally speaking, the drier the wine, the lesser the amount of SO2 it contains. [Ref](http://socialvignerons.com/2017/03/02/sulphites-so2-in-wine-top-7-facts/).
 
@@ -294,8 +300,8 @@ library(neuralnet)
 n <- names(train_)
 f <- as.formula(paste("QLT ~", paste(n[!n %in% "QLT"], collapse = " + ")))
 f
-#nn <- neuralnet(f,data=train_,hidden=c(6,3),linear.output=F)
-nn <- neuralnet(f,data=train_,linear.output=F)
+nn <- neuralnet(f,data=train_,hidden=c(6,3),linear.output=F)
+#nn <- neuralnet(f,data=train_,linear.output=F)
 ```
 
 The Figure \ref{fig:plot_nn} demostrates the NN model with the weights on each connection.
@@ -323,7 +329,7 @@ xtable(table(round(pr.nn_),as.factor(test.r)), caption = "\\tt NN Pledictor Conf
 
 
 
-```{r plot_rf2_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
+```{r plot_rf2_rw, fig.width=8, fig.height=5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
 library(ggplot2)
 df2 = data.frame(as.factor(test.r), pr.nn_)
 colnames(df2) <- c("Test","Prediction")
@@ -408,9 +414,11 @@ clusplot(wines_data.std, k.means.fit$cluster, main='',
 ## Explain by wine quality
 
 Let's try to explain clusters by the wine quality. Code below builds a matrix whe columns are cluster numbers and rows are wine types. As we can see, quality does not explain clusters, it's evenly distributed among them.
+QLT does not explain clusters, see Table \ref{table:clust_qlt}.
 
-```{r}
-table(wines_data[,12],k.means.fit$cluster)
+```{r results='asis'}
+xtable(table(wines_data[,12],k.means.fit$cluster),
+  caption = "\\tt Explaining Clusters by QLT", label = "table:clust_qlt")
 ```
 
 ## Explain by wine type
@@ -420,19 +428,28 @@ We have the following types:
  * 0 is red wine
  * 1 is red wine
 
-Let's try to explain clusters by the wine type. Code below builds a matrix whe columns are cluster numbers and rows are wine types. As we can see, cluster 3 contains red wines, cluster 1 and 2 contain white wines. 
+Let's try to explain clusters by the wine type. Code below builds a matrix whe columns are cluster numbers and rows are wine types. As we can see, cluster 3 contains red wines, cluster 1 and 2 contain white wine, see Table \ref{table:clust_type1}.
 
-
-```{r}
-table(wines_data[,13],k.means.fit$cluster)
+```{r results='asis'}
+centers <- table(wines_data[,13],k.means.fit$cluster)
+rownames(centers) <- c("Red Wine", "White Wine")
+xtable(centers,
+  caption = "\\tt Explaining Clusters by Wine Type", label = "table:clust_type1")
 ```
 
 Let's try to figure out how white wine clusters 1 and 2 differ from each other. Code below calculates a difference vector of cluster 1 and 2 and the sort the attributes in the order of the most influence:
 
 ```{r}
-v12 <- k.means.fit$centers[1,] - k.means.fit$centers[2,]
-v12 <- v12[order(abs(v12), decreasing = T)]
-print(v12)
+Difference <- k.means.fit$centers[1,] - k.means.fit$centers[2,]
+Difference <- Difference[order(abs(Difference), decreasing = T)]
+```
+
+Let's find what are the most significant factors that separate group 1 from group 2. Code below calculates the different results presented in Table \ref{table:dif1}.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+dh.rescale <- xtable(data.frame(Difference),
+  caption = "\\tt Difference between Clusters 1 and 1", label = "table:dif1")
+print(dh.rescale, scalebox=1)
 ```
 
 The table below shows that clusters 1 and 2 are mostly  differ in sweetness (RS), viscosity (DEN) and alcohol content (ALC). This make cluster 1 sweet wite wine group and cluster 2 contains dry white wines.
@@ -447,6 +464,15 @@ clusters_num = 6
 k.means.fit <- kmeans(wines_data.std, clusters_num,iter.max = 1000)
 k.means.fit$centers
 k.means.fit$size
+```
+
+## Cluster Analysis K-Means - more wine types
+
+```{r results='asis'}
+centers <- table(wines_data[,13],k.means.fit$cluster)
+rownames(centers) <- c("Red Wine", "White Wine")
+xtable(centers,
+  caption = "\\tt Explaining Clusters by Wine Type", label = "table:clust_type1")
 ```
 
 \newpage
