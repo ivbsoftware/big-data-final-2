@@ -15,7 +15,7 @@ author:
     affiliation   : "York University School of Continuing Studies"
     email         : "https://learn.continue.yorku.ca/user/profile.php?id=21219"
 abstract: >
-  Wine classification is a difficult task since taste is the least understood of the human senses. In this research we propose a data mining approach to predict human wine taste preferences that is based on easily available analytical tests at the wine certification step. We are using a dataset related to red and white Vinho Verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests. The classes are not balanced, there are much more normal wines than excellent or poor ones. The methods used to solve the problem are Random Forests, Clustering, Neural Networks and Support Vector Machine. Resuts of those methods applicaion are compared and analyzed.
+  Wine classification is a difficult task since taste is the least understood of the human senses. In this research we propose a data mining approach to predict human wine taste preferences that is based on easily available analytical tests at the wine certification step. We are using a dataset related to red and white Vinho Verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests. The classes are not balanced, there are much more normal wines than excellent or poor ones. The methods used to solve the problem are Random Forests, Clustering, Neural Networks and Support Vector Machine. Results of those methods applicaion are compared and analyzed.
 output:
   rticles::rjournal_article:
     includes:
@@ -25,7 +25,7 @@ figsintext        : no
 
 ## Introduction
 
-Data mining techniques aim at extracting knowledge from raw data. Several DM algorithms have been developed, each one with its own advantages and disadvantages \citep{witten_data_2011}. Those approaches have been applied to a large variety of problems, either for classification or regression. An interesting problem that has captured the attention of several researches is the prediction of wine quality \citep{CorCer09}. Wine industry is investing in new technologies for wine making and selling processes. A key issue in this context is wine certification which prevents the illegal adulteration and assures the wine quality. Wine certification is often assessed by physicochemical and sensory tests. The development of an accurate, computationally efficient and understandable prediction model can be of great utility for the wine industry. On the one hand, a good wine quality prediction can be very useful in the certification phase, since currently the sensory analysis is performed by human tasters, being clearly a subjective approach. An automatic predictive system can be integrated into a decision support system, helping the speed and quality of the oenologist performance. If it is concluded that several input variables are highly relevant to predict the wine quality, since in the production process some variables can be controlled, this information can be used to improve the wine quality. In this research wine taste preferences are modelled by algorithms. 
+Data mining techniques aim at extracting knowledge from raw data. Several DM algorithms have been developed, each one with its own advantages and disadvantages \citep{witten_data_2011}. Those approaches have been applied to a large variety of problems, either for classification or regression. An interesting problem that has captured the attention of several researches is the prediction of wine quality \citep{CorCer09}. Wine industry is investing in new technologies for wine making and selling processes. A key issue in this context is wine certification which prevents the illegal adulteration and assures the wine quality. Wine certification is often assessed by physicochemical and sensory tests. The development of an accurate, computationally efficient and understandable prediction model can be of great utility for the wine industry. On the one hand, a good wine quality prediction can be very useful in the certification phase, since currently the sensory analysis is performed by human tasters, being clearly a subjective approach. An automatic predictive system can be integrated into a decision support system, helping the speed and quality of the oenologist performance. If it is concluded that several input variables are highly relevant to predict the wine quality, since in the production process some variables can be controlled, this information can be used to improve the wine quality. In this research wine taste preferences are modeled by algorithms. 
 
 ## Background
 
@@ -78,7 +78,7 @@ Output variable (based on sensory data):
   13 - wine type (0 - red whine, 1 - white wine)
 ```
 
-Let's try to make sence of those attributes. There are many so called "impact compounds" in wine defining its taste and smell. Some of them are obvious, leke ALC, DEN and RS. Some of them are really bizarre \citep{noauthor_weird_2017}. The chemical components mentioned in the list have the following influence on the wine taste.
+Let's try to make sense of those attributes. There are many so called "impact compounds" in wine defining its taste and smell. Some of them are obvious, like ALC, DEN and RS. Some of them are really bizarre \citep{noauthor_weird_2017}. The chemical components mentioned in the list have the following influence on the wine taste.
 
 First is "Type" - red wine is different from white wine \citep{busch_learn_2011}. They look different and they certainly taste different as well. The culprit in both cases: the skins, and a little something they bring to the party called tannins. Tannin provides the backbone of red wine, which is why you might describe a red wine as “firm” or “leathery” or just plain “bitter.” White wine has tannin, but not enough to make it the star of the show. Instead, white wines are backboned by acidity. That’s why you might say a wine is “crisp” or “tart.” 
 
@@ -135,7 +135,8 @@ wines_data <- rbind(wines_red_data, wines_white_data)
 ```
 
 ## Preview of the data
-Quick view of the data attributes statistics presented in the Table \ref{table:sum_rw}. For each attribute in the dataset this table shows min, max, mean and normal distribution 1st and 3rd quartiles values. The first rows of the dataset are presented in Table \ref{table:dhead10}.
+
+Quick view of the data attributes statistics presented in the Table \ref{table:sum_rw}. For each attribute in the dataset this table shows min, max, mean and normal distribution 1st and 3rd quartiles values. The first rows of the dataset are presented in Table \ref{table:dhead10}. The dataset has no missing values.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
 library(xtable)
@@ -149,46 +150,76 @@ print (xtable(head(wines_red_data, n = 20),
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
 print(xtable(summary(wines_data[,1:6])), include.rownames = FALSE, scalebox=.9)
 print(xtable(summary(wines_data[,7:12]), 
-  caption = "\\tt Wines Dataset Attributes Summary", label = "table:sum_rw"),include.rownames = FALSE, scalebox=.9)
+  caption = "\\tt Wine Dataset Attributes Summary", label = "table:sum_rw"),include.rownames = FALSE, scalebox=.9)
 ```
 
 \newpage 
 
-## Check for missing values
-The dataset has no missing values. Code below calculate number of rows with missing values and checks if there is at list one.
+## Distribution of values in the dataset
+As it was mentioned before, the target value QLT of the wine quality is not equally distributed. The Figure \ref{fig:hist_1} demonstrates the distribution. As we can see, dataset covers mostly medium-quality wines with QLT between  5 and 7 well, low and high  quality wines represented poorly. Code below calculates this distribution.
 
 ```{r}
-any(is.na(wines_data))
+print(prop.table(table(wines_data$QLT)), digits = 4)
 ```
 
-## Distribution of target value in the dataset
-As we mentioned before, the target value QLT of the wine quality is not equally distributed. The Figure \ref{fig:hist_qlt_rw} demonstrates the distribution. As we can see, dataset covers mostly medium-quality wines with QLT between 5 and 7 well, low and high  quality wines represented poorly.
-
-```{r}
-prop.table(table(wines_data$QLT))
-```
-
-```{r hist_qlt_rw, fig.pos = 'h', fig.height=4, fig.width=5, fig.align="center", fig.cap="Distribution of Wine Quality Attribute"}
+```{r hist_1, fig.pos = 'h', fig.height=2.5, fig.width=5.5, fig.align="center", fig.cap="Distribution of QLT in the wine dataset"}
 ggplot(data = wines_data, mapping = aes(x = QLT)) + geom_bar()
+
 ```
+
+The Figure \ref{fig:dist1} demonstrates correlation of the most important "taste" attribute to the quality of the wines. As we can see from those charts, there is no direct correlation of any single attribute. Either they work in combination, or the dataset is missing important characteristics that affect human perception of the wine taste. 
+
+```{r dist1, echo=FALSE, fig.align="center", fig.cap="Correlation of QLT to the \"taste\" sttributes", fig.height=9, fig.width=5.5, paged.print=FALSE}
+library(ggplot2)
+df2 = data.frame(as.factor(wines_data$QLT), wines_data$VA)
+colnames(df2) <- c("QLT","VA")
+p1 <- ggplot(df2, aes(x = QLT, y = VA)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.1))
+
+df2 = data.frame(as.factor(wines_data$QLT), wines_data$ALC)
+colnames(df2) <- c("QLT","ALC")
+p2 <- ggplot(df2, aes(x = QLT, y = ALC)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.1))
+
+df2 = data.frame(as.factor(wines_data$QLT), wines_data$FSD)
+colnames(df2) <- c("QLT","FSD")
+p3 <- ggplot(df2, aes(x = QLT, y = FSD)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.1))
+
+df2 = data.frame(as.factor(wines_data$QLT), wines_data$pH)
+colnames(df2) <- c("QLT","pH")
+p4 <- ggplot(df2, aes(x = QLT, y = pH)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.1))
+
+
+df2 = data.frame(as.factor(wines_data$QLT), wines_data$SUL)
+colnames(df2) <- c("QLT","SUL")
+p5 <- ggplot(df2, aes(x = QLT, y = SUL)) +
+        geom_boxplot(outlier.colour = "red") +
+        geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.1))
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, p5, ncol = 1)
+```
+
+\newpage
+
+# Modelling of the Wine Quality
 
 ## Splitting the wine into train and test sets
 
-The wines dataset has been split in such a way that train and test sets would have the same distribution of the QLT attribute. We used 70:30 split ratio. 
+The wine dataset has been split in such a way that train and test sets would have the same distribution of the QLT attribute. We used 70:30 split ratio. 
+
 ```{r message=FALSE, warning=FALSE}
 library(caret)
 cluster1 <- wines_data[,1:12]
 train1.rows<- createDataPartition(y= cluster1$QLT, p=0.7, list = FALSE)
 train1.data<- cluster1[train1.rows,]
-prop.table((table(train1.data$QLT)))
-```
-
-```{r}
 test1.data<- cluster1[-train1.rows,]
-prop.table((table(test1.data$QLT)))
 ```
-
-# Modelling of the Wine Quality
 
 ## Random Forests Prediction
 
@@ -201,14 +232,15 @@ fitRF1 <- randomForest(
   data=train1.data, importance=TRUE, ntree=500)
 ```
 
-Random forests can be used to rank the importance of variables in a regression or classification problem in a natural way. To measure the importance of the j-th feature after training, the values of the j-th feature are permuted among the training data and the out-of-bag error is again computed on this perturbed data set. The importance score for thej-th feature is computed by averaging the difference in out-of-bag error before and after the permutation over all trees. The score is normalized by the standard deviation of these differences.
-Features which produce large values for this score are ranked as more important than features which produce small values. The Figure \ref{fig:forimp} presents this analysi.
+Random forests can be used to rank the importance of variables in a regression or classification problem in natural way. To measure the importance of the j-th feature after training, the values of the j-th feature are permuted among the training data and the out-of-bag error is again computed on this perturbed data set. The score is normalized by the standard deviation of these differences.
 
-```{r forimp, fig.width=5.5, fig.height=6, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Importance of the dataset attributes for the prediction of the QLT attribute"}
+Features which produce large values for this score are ranked as more important than features which produce small values. The Figure \ref{fig:forimp} presents this analysis. As we can see, the most important chemicals influencing the wine taste are ALC, VA. Next come SUL and FSD.
+
+```{r forimp, fig.width=5.5, fig.height=5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Importance of the dataset attributes for the prediction of the QLT attribute"}
 varImpPlot(fitRF1, main="")
 ```
 
-The accuracy of the RF prediction is calsulated below. Table \ref{table:confMat2} presents re results of the RF analysis in the form of a confusion matrix. The viasual presentation of the calsulations is presented in Figure \ref{fig:plot_rf_rw}.
+The accuracy of the RF prediction is calculated below. Table \ref{table:confMat2} presents re results of the RF analysis in the form of a confusion matrix. The visual presentation of the calculations is presented in Figure \ref{fig:plot_rf_rw}.
 
 ```{r}
 PredictionRF1 <- predict(fitRF1, test1.data)
@@ -220,7 +252,7 @@ xtable(table(round(PredictionRF1),test1.data$QLT), caption = "\\tt Random Forest
 ```
 
 
-```{r plot_rf_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Random Forest Prediction"}
+```{r plot_rf_rw, fig.width=5.5, fig.height=4, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Random Forest Prediction"}
 library(ggplot2)
 df2 = data.frame(as.factor(test1.data$QLT), PredictionRF1)
 colnames(df2) <- c("Test","Prediction")
@@ -229,33 +261,24 @@ ggplot(df2, aes(x = Test, y = Prediction)) +
         geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
 ```
 
-
-
-## Support Vector Machine Clasification
-
-### Create SVM Model and show summary
-```{r}
-library("e1071")
-svm_model <- svm(QLT ~ ., data=train1.data)
-summary(svm_model)
-```
-
-## Run SVM Prediction
+## Support Vector Regression
 
 The Support Vector Regression (SVR) uses the same principles as the SVM for classification, with only a few minor differences. First of all, because output is a real number it becomes very difficult to predict the information at hand, which has infinite possibilities. In the case of regression, a margin of tolerance (epsilon) is set in approximation to the SVM which would have already requested from the problem. But besides this fact, there is also a more complicated reason, the algorithm is more complicated therefore to be taken in consideration. However, the main idea is always the same: to minimize error, individualizing the hyperplane which maximizes the margin, keeping in mind that part of the error is tolerated.
 
-```{r}
+Code below runs the SVR prediction and evaluates its accuracy. As we can see from the Table \ref{table:confMat3} and Figure \ref{fig:plot_rf1_rw}, the accuracy is about 63%, almost 10% less than accuracy of the RF prediction, but the prediction of QLT for the high quality wines increase almost 10%.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library("e1071")
+svm_model <- svm(QLT ~ ., data=train1.data)
 predSVM <- predict(svm_model, test1.data)
 cor(predSVM,test1.data$QLT)
 ```
-
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
 xtable(table(round(predSVM),test1.data$QLT), caption = "\\tt SVM Pledictor Confusion Matrix", label = "table:confMat3")
 ```
 
-
-```{r plot_rf1_rw, fig.width=5.5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
+```{r plot_rf1_rw, echo=FALSE, fig.align="center", fig.cap="SVM Prediction", fig.height=4, fig.width=5.5, message=FALSE, warning=FALSE, paged.print=FALSE}
 library(ggplot2)
 df2 = data.frame(as.factor(test1.data$QLT), predSVM)
 colnames(df2) <- c("Test","Prediction")
@@ -264,18 +287,20 @@ ggplot(df2, aes(x = Test, y = Prediction)) +
         geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
 ```
 
+\newpage
 
+## Neural Networks Modeling
 
-## Neural Networks Prediction
-
-[source](https://datascienceplus.com/fitting-neural-network-in-r/)
+Neural Networks (NN) computing systems vaguely inspired by the biological neural networks that constitute animal brains. Such systems "learn" to perform tasks by considering examples, generally without being programmed with any task-specific rules. Neural networks have always been one of the fascinating machine learning models, not only because of the fancy backpropagation algorithm but also because of their complexity (think of deep learning with many hidden layers) and structure inspired by the brain.
 
 ### Preparing scaled data
+
+Using NN requires all the data to be normalized. The code below performs uniform scaling of the dataset and splitting it into train and test sets.
+
 ```{r}
 set.seed(4231)
 data <- wines_data[,1:12]
 index <- sample(1:nrow(data),round(0.75*nrow(data)))
-#index <- createDataPartition(y= data$QLT, p=0.5, list = FALSE)
 maxs <- apply(data, 2, max) 
 mins <- apply(data, 2, min)
 scaled <- as.data.frame(scale(data, center = mins, scale = maxs - mins))
@@ -283,8 +308,18 @@ train_ <- scaled[index,]
 test_ <- scaled[-index,]
 ```
 
+### NN model
+The R "neuralnet"" package is used for this task in the report \citep{noauthor_fitting_nodate}. Code below creates the NN model and trains it using the train set. Figure \ref{fig:plot_nn} demonstrates the NN model with the weights on each connection used for calculations.
 
-```{r message=FALSE, warning=FALSE}
+```
+library(neuralnet)
+n <- names(train_)
+f <- as.formula(paste("QLT ~", paste(n[!n %in% "QLT"], collapse = " + ")))
+f
+nn <- neuralnet(f,data=train_,hidden=c(6,3),linear.output=F)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(neuralnet)
 n <- names(train_)
 f <- as.formula(paste("QLT ~", paste(n[!n %in% "QLT"], collapse = " + ")))
@@ -292,19 +327,24 @@ f
 #nn <- neuralnet(f,data=train_,hidden=c(6,3),linear.output=F)
 ```
 
-The Figure \ref{fig:plot_nn} demostrates the NN model with the weights on each connection.
-
-```{r plot_nn, echo=TRUE, fig.height=9, fig.width=6, message=FALSE, warning=FALSE, fig.cap="Graphical representation of the NN model with the weights on each connection"}
+```{r plot_nn, echo=FALSE, fig.cap="Graphical representation of the NN model with the weights on each connection", message=FALSE, warning=FALSE, out.width = "1.1\\textwidth"}
 #plot(nn)
 knitr::include_graphics("images/nn_lg.png")
 ```
 
 
-### Predicting whine quality using neural networks
+### Predicting wine quality using neural networks
 
-NN outputs a normalized prediction, so we need to scale it back in order to make a meaningful comparison (or just a simple prediction)
+NN outputs a normalized prediction, so we need to scale it back in order to make a meaningful comparison (or just a simple prediction). The code below performs that conversion. We calculated prediction of the NN model for the test set and discovered, that NN has overall accuracy about 60% which is lower than RF and SVR, but NN has better precision for best and worst wines than other method we used. Figure \ref{fig:plot_rf2_rw1} and Table \ref{table:confMat4} present the results of the calculations.
 
-```{r eval=FALSE, include=FALSE}
+```
+pr.nn <- compute(nn,test_[,1:11])
+pr.nn_ <- pr.nn$net.result*(max(data$QLT)-min(data$QLT))+min(data$QLT)
+test.r <- (test_$QLT)*(max(data$QLT)-min(data$QLT))+min(data$QLT)
+cor(test.r,pr.nn_)
+```
+
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 pr.nn <- compute(nn,test_[,1:11])
 pr.nn_ <- pr.nn$net.result*(max(data$QLT)-min(data$QLT))+min(data$QLT)
 test.r <- (test_$QLT)*(max(data$QLT)-min(data$QLT))+min(data$QLT)
@@ -336,11 +376,11 @@ xtable(table(round(pr.nn_),as.factor(test.r)), caption = "\\tt NN Pledictor Conf
 ## [1] 0.6043741164
 ```
 
-```{r fig.align = "center", out.width = "1\\textwidth"}
+```{r plot_rf2_rw1, echo=FALSE, fig.align="center", fig.cap="Neural Network Prediction Scatter Plot", fig.height=4, fig.width=5.5, out.width = "1\\textwidth"}
 knitr::include_graphics("images/nn_scatter.png")
 ```
 
-```{r plot_rf2_rw, eval=FALSE, fig.align="center", fig.cap="SVM Predictor Scatter Plot", fig.height=5, fig.width=8, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+```{r plot_rf2_rw, eval=FALSE, fig.align="center", fig.cap="Neural Network Predictor Scatter Plot", fig.height=5, fig.width=8, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 library(ggplot2)
 df2 = data.frame(as.factor(test.r), pr.nn_)
 colnames(df2) <- c("Test","Prediction")
@@ -349,30 +389,43 @@ ggplot(df2, aes(x = Test, y = Prediction)) +
         geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
 ```
 
-## Can we Guess Wine Type by its Biochemical Content?
+\newpage
 
-```{r fig.align = "center", out.width = "0.75\\textwidth"}
+# Cluster Analysis
+
+The modeling of the wine quality does not answer many important questions. We eill attempt to answer two of them in this report:
+
+- Was the dataset was properly labeled by human experts? Is there a bios here?
+- can we guess wine type by its physicochemical content (Fig \ref{fig:wines})?
+
+To answer those questions we will apply Clustering Analysis. Cluster is a collection of data objects similar to one another within the same cluster, dissimilar to the objects in other clusters. Cluster analysis is grouping a set of data objects into clusters. Clustering is unsupervised classification, no predefined classes assumed.
+
+```{r wines, echo=FALSE, fig.align="center", out.width=".7\\textwidth", fig.cap="Vihno Verde Wine Types"}
 knitr::include_graphics("images/vinho-verde-wine-region-20.jpg")
 ```
+
+\newpage
 
 ## Preparation for cluster analysis
 
 ### Wines dataset normalizing
 
-Normalizing wine dataset in preparation for clustering
+Normalizing wine dataset in preparation for clustering is done with help of the code below. The statistical characteristics of the attributes after the normalizing presented in 
 ```{r}
 wines_data.std <- scale(wines_data[1:11])
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
-print(xtable(summary(head(wines_data.std[,1:6]))), include.rownames = FALSE, scalebox=1)
-print(xtable(summary(head(wines_data.std[,7:11]))),include.rownames = FALSE, scalebox=1)
+print(xtable(summary(head(wines_data.std[,1:6]))), include.rownames = FALSE, scalebox=.9)
+print(xtable(summary(head(wines_data.std[,7:11])), 
+  caption = "\\tt Wine Dataset Normalized Attributes Summary", label = "table:sum_rw"),include.rownames = FALSE, scalebox=.9)
 ```
 
 ### Determine optimal number of clusters
 First we need to determine number of clusters. 
-Looking at the percentage of variance explained as: a function of the number of clusters, we should choose a number of clusters in order to ensure that too much modeling of the data is not given. More precisely, if one plots the percentage of variance explained by the clusters against the number of clusters, the first clusters will add much more information (explains a lot of variance); but at some point, the marginal gain will drop, giving an angle in the graph. The number of clusters is chosen at this point. This method is called the 'elbow criterion'.
-The diagram presented in Figure \ref{fig:elbow} demonstrates the 'elbow' curve. From this diagram we decided to use five (5) clusters in our analysis.
+Looking at the percentage of variance explained as a function of the number of clusters, we should choose a number of clusters in order to ensure that too much modeling of the data is not given. More precisely, if one plots the percentage of variance explained by the clusters against the number of clusters, the first clusters will add much more information (explains a lot of variance); but at some point, the marginal gain will drop, giving an angle in the graph. The number of clusters is chosen at this point. 
+
+This method is called the 'elbow criterion'. The code below calculated and prints the "Elbow Criterion Diagram":
 
 ```{r elbow,  fig.height=4, fig.width=5.5, message=FALSE, warning=FALSE, fig.cap="Elbow Criterion Diagram"}
 wssplot <- function(data, nc=15, seed=1234){
@@ -386,11 +439,16 @@ wssplot <- function(data, nc=15, seed=1234){
 wssplot(wines_data.std, nc=8) 
 ```
 
-### Clustering using K-means method
+The diagram presented in Figure \ref{fig:elbow} demonstrates the calculated 'elbow' curve. From this diagram we decided to use three (3) clusters in our analysis.
+
+
+## Clustering using K-means method
 
 k-means clustering \citep{noauthor_k-means_2018} is a method of vector quantization, which is popular for cluster analysis in data mining. k-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. This results in a partitioning of the data space into Voronoi cells \citep{noauthor_nouvelles_1908}.
 
-The problem is computationally difficult (NP-hard), k-means clustering tends to find clusters of comparable spatial extent, while the expectation-maximization mechanism allows clusters to have different shapes. The algorithm has a loose relationship to the k-nearest neighbor classifier. One can apply the 1-nearest neighbor classifier on the cluster centers obtained by k-means to classify new data into the existing clusters. This is known as nearest centroid classifier or Rocchio algorithm.
+The problem is computationally difficult (NP-hard), k-means clustering tends to find clusters of comparable spatial extent, while the expectation-maximization mechanism allows clusters to have different shapes. 
+
+The algorithm has a loose relationship to the k-nearest neighbor classifier. One can apply the 1-nearest neighbor classifier on the cluster centers obtained by k-means to classify new data into the existing clusters. This is known as nearest centroid classifier or Rocchio algorithm.
 
 Resulting cluster centers are presented in Table \ref{table:kcent1}.
 
@@ -413,9 +471,6 @@ dh.rescale <- xtable(k.means.fit$centers,
 print(dh.rescale, scalebox=1)
 ```
 
-
-
-
 ```{r fig.height=9, fig.width=6, fig.cap="2D representation of the Cluster solution"}
 library(cluster)
 clusplot(wines_data.std, k.means.fit$cluster, main='',
@@ -423,46 +478,38 @@ clusplot(wines_data.std, k.means.fit$cluster, main='',
          labels=clusters_num, lines=0)
 ```
 
+## Explain Cluters by Wine Quality
 
-
-
-
-# Explain clusters
-
-## Explain by wine quality
-
-Let's try to explain clusters by the wine quality. Code below builds a matrix whe columns are cluster numbers and rows are wine types. As we can see, quality does not explain clusters, it's evenly distributed among them.
+Let's try to explain clusters by the wine quality. Code below builds a matrix when columns are cluster numbers and rows are wine types. As we can see, quality does not explain clusters, it's evenly distributed among them.
 QLT does not explain clusters, see Table \ref{table:clust_qlt}.
 
-```{r results='asis'}
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 xtable(table(wines_data[,12],k.means.fit$cluster),
   caption = "\\tt Explaining Clusters by QLT", label = "table:clust_qlt")
 ```
 
-## Explain by wine type
+\newpage
 
-We have the following types:
+## Explain Clusters by Wine Type
 
- * 0 is red wine
- * 1 is red wine
+Let's try to explain clusters by the wine type. Code below builds a matrix when columns are cluster numbers and rows are wine types. As we can see, cluster 3 contains red wines, cluster 1 and 2 contain white wine, see Table \ref{table:clust_type1}.
 
-Let's try to explain clusters by the wine type. Code below builds a matrix whe columns are cluster numbers and rows are wine types. As we can see, cluster 3 contains red wines, cluster 1 and 2 contain white wine, see Table \ref{table:clust_type1}.
-
-```{r results='asis'}
+```{r}
 centers <- table(wines_data[,13],k.means.fit$cluster)
-rownames(centers) <- c("Red Wine", "White Wine")
-xtable(centers,
-  caption = "\\tt Explaining Clusters by Wine Type", label = "table:clust_type1")
 ```
 
-Let's try to figure out how white wine clusters 1 and 2 differ from each other. Code below calculates a difference vector of cluster 1 and 2 and the sort the attributes in the order of the most influence:
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+rownames(centers) <- c("Red Wine", "White Wine")
+xtable(centers,
+  caption = "\\tt Explaining 3 Clusters by Wine Type", label = "table:clust_type1")
+```
+
+Let's try to figure out how white wine clusters 1 and 2 differ from each other. Code below calculates a difference vector of cluster 1 and 2 and sorts the attributes in the order of the most influence. The results presented in Table \ref{table:dif1}.
 
 ```{r}
 Difference <- k.means.fit$centers[1,] - k.means.fit$centers[2,]
 Difference <- Difference[order(abs(Difference), decreasing = T)]
 ```
-
-Let's find what are the most significant factors that separate group 1 from group 2. Code below calculates the different results presented in Table \ref{table:dif1}.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
 dh.rescale <- xtable(data.frame(Difference),
@@ -470,47 +517,78 @@ dh.rescale <- xtable(data.frame(Difference),
 print(dh.rescale, scalebox=1)
 ```
 
-The table below shows that clusters 1 and 2 are mostly  differ in sweetness (RS), viscosity (DEN) and alcohol content (ALC). This make cluster 1 sweet wite wine group and cluster 2 contains dry white wines.
+The table shows that clusters 1 and 2 are mostly  differ in sweetness (RS), viscosity (DEN) and alcohol content (ALC). This make cluster 1 sweet white wine group and cluster 2 contains dry white wines.
 
-## More wine groups
+\newpage 
 
-Trying second "elbow" at 6.
+## More Wine Groups
+
+Next we decided to try the second "elbow" on Figure \ref{fig:elbow} at 6 clusters. The resulting cluster centers presented in Table \ref{table:kcent2}.
 
 ```{r  fig.height=10, fig.width=10}
 set.seed(420)
 clusters_num = 6
 k.means.fit <- kmeans(wines_data.std, clusters_num,iter.max = 1000)
-k.means.fit$centers
-k.means.fit$size
 ```
 
-## Cluster Analysis K-Means - more wine types
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+dh.rescale <- xtable(k.means.fit$centers,
+  caption = "\\tt K-means Resulting Cluster Centers - 6 Clusters", label = "table:kcent2")
 
-```{r results='asis'}
+print(dh.rescale, scalebox=1)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 centers <- table(wines_data[,13],k.means.fit$cluster)
 rownames(centers) <- c("Red Wine", "White Wine")
 xtable(centers,
-  caption = "\\tt Explaining Clusters by Wine Type", label = "table:clust_type1")
+  caption = "\\tt Explaining 6 Clusters by Wine Type", label = "table:clust_type1")
 ```
+
+Let's try to figure out how white wine clusters 3 and 4 differ from each other. Code below calculates a difference vector of cluster 3 and 4 and the sort the attributes in the order of the most influence:
+
+```{r}
+Difference <- k.means.fit$centers[3,] - k.means.fit$centers[4,]
+Difference <- Difference[order(abs(Difference), decreasing = T)]
+```
+
+Let's find what are the most significant factors that separate group 3 from group 4. Code below calculates the different results presented in Table \ref{table:dif2}.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+dh.rescale <- xtable(data.frame(Difference),
+  caption = "\\tt Difference between Clusters 3 and 4", label = "table:dif2")
+print(dh.rescale, scalebox=1)
+```
+
+What's the difference between red wines 3 and 4? Looking at the most important attributes difference and relying on the explanation how thosw chemicals affect the wine taste and taking into account information we discovered about Vihno Verde wines we can conclude that:
+
+- Cluster 3 - contains young fruity sour red wines
+- Cluster 4 - contains old red wines with a bit of bitterness
+
+Unfortunately, lack of more specific information about connection of physicochemical components on the wine taste, this is the most that we could conclude from the cluster analysis. The dataset is missing some important attributes that would help us to cluster wines and predict the quality more reliably.
 
 \newpage
 
 # Conclusion
 Through exploring the Wine Quality dataset we developed an algorithm to predict the wine quality using its chemical characteristics and extracted some interesting information about the wines presented. 
 
-First we applied the Random Forest Regresson methos and achieved accuracy of predicting wine quality of 72%. The method has shown that the most important attriutes that influence the quality estimation of wines by human experts are alcohol (ALC), volatile acidity (VA) and free sulfur dioxide (FSD). The RF method showed low precision in the area of poor and high quality wines. 
+First we applied the Random Forest Regression method and achieved accuracy of predicting wine quality of 72%. The method has shown that the most important attributes that influence the quality estimation of wines by human experts are alcohol (ALC), volatile acidity (VA) and free sulfur dioxide (FSD). The RF method showed low precision in the area of poor and high quality wines. 
 
-Next we applied a Support Vector Machine Regression method (SVM) and achieved accuracy of 62, lower than RF, but the precision in the area of poor and high quality wines increased at least 20%.
+Next we applied a Support Vector Regression method (SVR) and achieved accuracy of 62, lower than RF, but the precision in the area of poor and high quality wines increased at least 20%.
 
-Next we applied we applied a Neural Networks (NN) regression cofigured with 11:6:3:1 layers and achieved overall accuracy of 60%, lower than both RF and SVM. Interestingly, the precision of NN in the area of poor and high quality wines was almost 10% higher than SVM, making NN the best method in quality prediction of the most interesting and least presented sector of wines in the dataset.
+Next we applied a Neural Networks (NN) regression cofigured with 11:6:3:1 layers and achieved overall accuracy of 60%, lower than both RF and SVM. Interestingly, the precision of NN in the area of poor and high quality wines was almost 10% higher than SVM, making NN the best method in quality prediction of the most interesting and least presented sector of wines in the dataset.
 
-Finally we applied Cluster Analysis (CA) to investigate if we could predict the quality better or if we could get any new knowledge from the dataset. We discovered that there is no correlation between wine quality and biochemical data from the CA point of view. On the other hand, there is a strong correlation between clusters and wine types. Even though the information about influence of 11 chemical characteristics on the taste of wine is very limited, we discovered clusters that contain such types of wine as white sweet, white dry, rose and old dry red. We can add that more subtypes of wine were discovered, but it is diffucult to give them specific names using only the dataset at hand.
+Finally, we applied Cluster Analysis (CA) to investigate if we could predict the quality better or if we could get any new knowledge from the dataset. We discovered that there is no correlation between wine quality and biochemical data from the CA point of view. On the other hand, there is a strong correlation between clusters and wine types. Even though the information about influence of 11 chemical characteristics on the taste of wine is very limited, we discovered clusters that contain such types of wine as white sweet, white dry, rose and old dry red. We can add that more subtypes of wine were discovered, but it is difficult to give them specific names using only the dataset at hand.
 
-The project was a success. Next steps would be collecting more information about relation of the base chemical component on the wine taste and finding datasets with additional wine attributes, related more to the human interpretation of wines, and connets those datasets with the one used in the project.
+The project was a success. Next steps would be collecting more information about relation of the base chemical component on the wine taste and finding datasets with additional wine attributes, related more to the human interpretation of wines, and connects those datasets with the one used in the project.
+
+\newpage
 
 \bibliography{RJreferences}
 
 \newpage
 
 # Note from the Authors
-This file was generated using [_The R Journal_ style article template](https://github.com/rstudio/rticles), additional information on how to prepare articles for submission is here - [Instructions for Authors](https://journal.r-project.org/share/author-guide.pdf). The article itself is an executable R Markdown file that could be [downloaded from Github](https://github.com/ivbsoftware/scda1010-lab2/tree/master/docs/R_Journal/scda1010-lab2) with all the necessary artifacts.
+This file was generated using [_The R Journal_ style article template](https://github.com/rstudio/rticles), additional information on how to prepare articles for submission is here - [Instructions for Authors](https://journal.r-project.org/share/author-guide.pdf). The article itself is an executable R Markdown file that could be [downloaded from Github](https://github.com/ivbsoftware/big-data-final-2/blob/master/docs/R_Journal/big-data-final-2/) with all the necessary artifacts \citep{ivbsoftware_big-data-final}.
+
+
