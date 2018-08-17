@@ -1,5 +1,5 @@
 ---
-title: Vinho Verde Wines Quality Data Mining
+title: '"Vinho Verde" Wines Quality Modeling'
 
 author: 
   - name          : "Viviane Adohouannon"
@@ -15,7 +15,7 @@ author:
     affiliation   : "York University School of Continuing Studies"
     email         : "https://learn.continue.yorku.ca/user/profile.php?id=21219"
 abstract: >
-  Wine classification is a difficult task since taste is the least understood of the human senses. In this research we propose a data mining approach to predict human wine taste preferences that is based on easily available analytical tests at the certification step. We are using a dataset related to red vinho verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests. The classes are ordered and not balanced (e.g. there are much more normal wines than excellent or poor ones). The method used to solve the problem are Random Forests, Clustering, Neural Networks and upport Vector Machine Clasification (SVM). Resuts of those methoda applicaion are compared and analyzed.
+  Wine classification is a difficult task since taste is the least understood of the human senses. In this research we propose a data mining approach to predict human wine taste preferences that is based on easily available analytical tests at the wine certification step. We are using a dataset related to red and white Vinho Verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests. The classes are not balanced, there are much more normal wines than excellent or poor ones. The methods used to solve the problem are Random Forests, Clustering, Neural Networks and Support Vector Machine. Resuts of those methods applicaion are compared and analyzed.
 output:
   rticles::rjournal_article:
     includes:
@@ -25,12 +25,12 @@ figsintext        : no
 
 ## Introduction
 
-Data mining (DM) techniques aim at extracting knowledge from raw data. Several DM algorithms have been developed, each one with its own advantages and disadvantages (Witten and Frank, 2005). DM approaches have been applied to a large variety of problems, either for classification or regression. An interesting problem that has captured the attention of several researches is the prediction of wine quality (Cortez et al., 2009; Yin and Han, 2003). Wine industry is investing in new technologies for wine making and selling processes. A key issue in this context is wine certification which prevents the illegal adulteration and assures the wine quality. Wine certification is often assessed by physicochemical and sensory tests (Ebeler, 1999). The development of an accurate, computationally efficient and understandable prediction model can be of great utility for the wine industry. On the one hand, a good wine quality prediction can be very useful in the certification phase, since currently the sensory analysis is performed by human tasters, being clearly a subjective approach. An automatic predictive system can be integrated into a decision support system, helping the speed and quality of the oenologist performance. If it is concluded that several input variables are highly relevant to predict the wine quality, since in the production process some variables can be controlled, this information can be used to improve the wine quality. In this paper wine taste preferences are modelled by DM algorithms. 
+Data mining techniques aim at extracting knowledge from raw data. Several DM algorithms have been developed, each one with its own advantages and disadvantages \citep{witten_data_2011}. Those approaches have been applied to a large variety of problems, either for classification or regression. An interesting problem that has captured the attention of several researches is the prediction of wine quality \citep{CorCer09}. Wine industry is investing in new technologies for wine making and selling processes. A key issue in this context is wine certification which prevents the illegal adulteration and assures the wine quality. Wine certification is often assessed by physicochemical and sensory tests. The development of an accurate, computationally efficient and understandable prediction model can be of great utility for the wine industry. On the one hand, a good wine quality prediction can be very useful in the certification phase, since currently the sensory analysis is performed by human tasters, being clearly a subjective approach. An automatic predictive system can be integrated into a decision support system, helping the speed and quality of the oenologist performance. If it is concluded that several input variables are highly relevant to predict the wine quality, since in the production process some variables can be controlled, this information can be used to improve the wine quality. In this research wine taste preferences are modelled by algorithms. 
 
 ## Background
 
 Portugal is a top ten wine exporting country with
-3.17% of the market share in 2005 \citep{faostat}. Exports of its vinho verde wine (from
+3.17% of the market share in 2005 \citep{faostat}. Exports of its Vinho Verde wine (from
 the northwest region) have increased by yearly. To support
 its growth, the wine industry is investing in new technologies for both wine
 making and selling processes. Wine certification and quality assessment are
@@ -49,19 +49,7 @@ are complex and still not fully understood \citep{legin_evaluation_2003}.
 
 ## Objective
 
-The objective of this project is is to provide a reliable and feasible recommendation algorithm to predict wine quality based on physicochemical tests.  The target value is a numeric value of wine 'quality', hence the task could be solved by Linear Regression methods. The following methodology 'check list' standard for a Linear Regression tasks will be applied to the problem at hand:
-
- * Put all relevant variables in the model
- * Leave the irrelevant variables out
- * Check linearity
- * Check regression assumptions:
- 
-    - Residuals have a mean of zero
-    - Normality of errors
-    - Residuals are not auto correlated
-    - Linearity of variables
-    - More data than independent variables is used in model building
-    - No excessive collinearity
+The objective of this project is is to provide a reliable and feasible recommendation algorithm to predict wine quality based on physicochemical tests.  The target value is a numeric value of wine 'quality', hence the task could be solved by several regression methods, like Random Forest, Support Vector Machines and Neural Networks. In addition, it was decided to apply Clustering Analysis to investigate if we could predict the quality better or if we could get any new knowledge from the dataset.
 
 \newpage
 
@@ -70,44 +58,46 @@ The objective of this project is is to provide a reliable and feasible recommend
 The two datasets presented in \citep{WineDataset} are related to red and white variants of the Portuguese "Vinho Verde" wine. For more details, consult \citep{CorCer09}. Due to privacy and logistic issues, only physicochemical (inputs) and sensory (the output) variables are available (e.g. there is no data about grape types, wine brand, wine selling price, etc.). The classes are ordered and not balanced (e.g. there are much more normal wines than excellent or poor ones). 
 
 ```
-Input variables (based on physicochemical tests): 
+The dataset contains 6497 observations:
 
-1 - fixed acidity        (FA)
-2 - volatile acidity     (VA)
-3 - citric acid          (CA)
-4 - residual sugar       (RS)
-5 - chlorides            (CH)
-6 - free sulfur dioxide  (FSD)
-7 - total sulfur dioxide (TSD)
-8 - density              (DEN)
-9 - pH                   (pH)
-10 - sulphates           (SUL)
-11 - alcohol             (ALC) 
+Input variables (based on physicochemical tests): 
+  1 - fixed acidity        (FA)
+  2 - volatile acidity     (VA)
+  3 - citric acid          (CA)
+  4 - residual sugar       (RS)
+  5 - chlorides            (CH)
+  6 - free sulfur dioxide  (FSD)
+  7 - total sulfur dioxide (TSD)
+  8 - density              (DEN)
+  9 - pH                   (pH)
+  10 - sulphates           (SUL)
+  11 - alcohol             (ALC) 
 
 Output variable (based on sensory data): 
-12 - quality (score between 0 and 10) - (QLT)
+  12 - quality, based on sensory data (score between 0 and 10) - (QLT)
+  13 - wine type (0 - red whine, 1 - white wine)
 ```
 
-[Wines by Taste](https://www.primermagazine.com/2011/learn/an-easy-explanation-of-wine-types)
+Let's try to make sence of those attributes. There are many so called "impact compounds" in wine defining its taste and smell. Some of them are obvious, leke ALC, DEN and RS. Some of them are really bizarre \citep{noauthor_weird_2017}. The chemical components mentioned in the list have the following influence on the wine taste.
 
-https://winefolly.com/tutorial/weird-wine-flavors-and-the-science-behind-them/
+First is "Type" - red wine is different from white wine \citep{busch_learn_2011}. They look different and they certainly taste different as well. The culprit in both cases: the skins, and a little something they bring to the party called tannins. Tannin provides the backbone of red wine, which is why you might describe a red wine as “firm” or “leathery” or just plain “bitter.” White wine has tannin, but not enough to make it the star of the show. Instead, white wines are backboned by acidity. That’s why you might say a wine is “crisp” or “tart.” 
 
-VA intensifies the taste of
-the other acids and tannins (https://www.awri.com.au/wp-content/uploads/2018/03/s1982.pdf)
-As the name suggests, volatile acidity (VA) is referencing volatility in wine, which causes it to go bad. Acetic acid builds up in wine when there’s too much exposure to oxygen during winemaking and is usually caused by acetobacter (the vinegar-making bacteria!). Volatile acidity is considered a fault at higher levels (1.4 g/L in red and 1.2 g/L in white) and can smell sharp like nail polish remover. But at lower levels, it can add fruity-smelling raspberry, passion fruit, or cherry-like flavors. Wines that have long fermentations (1 month or more), such as Amarone della Valpolicella, Ice Wine, and Barolo generally accumulate higher levels of volatile acidity.
+Then there is volatile acidity (VA) that intensifies the taste of the other acids and tannins \citep{corison_must_1979}. As the name suggests it is referencing volatility in wine, which causes it to go bad. Acetic acid builds up in wine when there’s too much exposure to oxygen during winemaking and is usually caused by acetobacter (the vinegar-making bacteria!). VA is considered a fault at higher levels (1.4 g/L in red and 1.2 g/L in white) and can smell sharp like nail polish remover. But at lower levels, it can add fruity-smelling raspberry, passion fruit, or cherry-like flavors
 
-Sulphur dioxide (SO2) is the most widely used and controversial additive in winemaking. Its main functions are to inhibit or kill unwanted yeasts and bacteria, and to protect wine from oxidation. Important concentrations of SO2 can affect the smell of the wine. It is also most-often noted on the finish, with some wines displaying a strong flavor of Sulphur after you've tasted (or swallowed) on the back of the mouth. Red wine contains less Sulphur Dioxide than white and ros? as the above regulations show. Generally speaking, the drier the wine, the lesser the amount of SO2 it contains. [Ref](http://socialvignerons.com/2017/03/02/sulphites-so2-in-wine-top-7-facts/).
+Sulphur dioxide (SO2) is used to inhibit or kill unwanted yeasts and bacteria, and to protect wine from oxidation. Important concentrations of SO2 can affect the smell of the wine. It is also most-often noted on the finish, with some wines displaying a strong flavor of Sulphur after you've tasted (or swallowed) on the back of the mouth. Red wine contains less Sulphur Dioxide than white and rose as the above regulations show. Generally speaking, the drier the wine, the lesser the amount of SO2 it contains. \citep{noauthor_sulfites_nodate}.
 
-In wine tasting, the term “acidity” refers to the fresh, tart and sour attributes of the wine which are evaluated in relation to how well the acidity balances out the sweetness and bitter components of the wine such as tannins. Three primary acids are found in wine grapes: tartaric, malic and citric acids
+In wine tasting, the general term “acidity” defined by pH, FA and CA, refers to the fresh, tart and sour attributes of the wine which are evaluated in relation to how well the acidity balances out the sweetness and bitter components of the wine such as tannins.
 
-Sulfates aren't involved in wine production, but some beer makers use calcium sulfate—also known as brewers' gypsum—to correct mineral deficiencies in water during the brewing process. Sulfites are naturally occurring compounds found in all wines; they act as a preservative by inhibiting microbial growth.
+Sulfates (SUL) aren't involved in wine production, but some beer makers use calcium sulfate—also known as brewers' gypsum—to correct mineral deficiencies in water during the brewing process. Sulfites are naturally occurring compounds found in all wines; they act as a preservative by inhibiting microbial growth. 
 
-Red wines from different countries have been assessed in order to determine the influence of terroir and grape variety in their concentration of chloride. [Ref](http://www.scielo.br/scielo.php?script=sci_arttext&pid=S0101-20612015000100095)
+The amount of CH in wine is influenced by both the terroir and type of grape \citep{coli_chloride_2015}, and the importance of quantification lies in the fact that wine flavor is strongly impacted by this particular ion, which, in high concentration, gives the wine an undesirable salty taste.
+
+\newpage
 
 ## Data Preparation
-To perform the analysis, certain R libraries were used. The code below was used to load and initialize the libraries. The first line invoking seed function was applied to enforce the repeatability of the calculation results.
+To perform the analysis, certain R libraries were used. The code below was used to load and initialize the librarie, then loads the data.  To pretty-print the tables in this report we used xtable \citep{R-xtable} library.
 
-```{r message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+```{r message=FALSE, warning=FALSE}
 set.seed(42)
 library(ggplot2)
 library(reshape2)
@@ -118,59 +108,51 @@ library(data.table)
 library(ggplot2)
 ```
 
-## Reading red wines dataset
-
-The dataset \citep{WineDataset} of red wine quality has 12 attributes and 1599 instances. For more information, read \citep{CorCer09}. The following is the concept structure of the dataset:
-
-```{r}
+```{r message=FALSE, warning=FALSE}
 wines_red_data <- 
   read.csv(
     "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv",
     sep=";", 
     header = TRUE, 
     col.names = c("FA","VA","CA","RS","CH","FSD","TSD","DEN","pH","SUL","ALC","QLT"))
+
 wines_red_data$TYPE <- 0
 ```
 
-## Reading white wines dataset
-
-```{r}
+```{r message=FALSE, warning=FALSE}
 wines_white_data <- 
   read.csv(
     "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv",
     sep=";", 
     header = TRUE, 
     col.names = c("FA","VA","CA","RS","CH","FSD","TSD","DEN","pH","SUL","ALC","QLT"))
+
 wines_white_data$TYPE <- 1
 ```
 
-## Combining the datasets
 ```{r}
 wines_data <- rbind(wines_red_data, wines_white_data)
-summary(wines_data)
 ```
 
 ## Preview of the data
-To pretty-print the first rows of the dataset xtable \citep{R-xtable} library was used to generate Table \ref{table:dhead10}.
+Quick view of the data attributes statistics presented in the Table \ref{table:sum_rw}. For each attribute in the dataset this table shows min, max, mean and normal distribution 1st and 3rd quartiles values. The first rows of the dataset are presented in Table \ref{table:dhead10}.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
 library(xtable)
 options(xtable.floating = TRUE)
 options(xtable.timestamp = "")
 options(xtable.comment = FALSE)
-xtable(head(wines_red_data, n = 10), 
-  caption = "\\tt Red Wines Quality Dataset - first rows", label = "table:dhead10")
+print (xtable(head(wines_red_data, n = 20), 
+  caption = "\\tt Red Wines Quality Dataset - first rows", label = "table:dhead10"), scalebox=.9)
 ```
-
-## Data attributes summary
-Quick view of the data attributes statistics presented in the Table \ref{table:sum_rw}. For each attribute in the dataset this table shows min, max, mean and normal distribution 1st and 3rd quartiles values.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
 print(xtable(summary(wines_data[,1:6])), include.rownames = FALSE, scalebox=.9)
 print(xtable(summary(wines_data[,7:12]), 
-  caption = "\\tt Wines Dataset Summary", label = "table:sum_rw"),
-  include.rownames = FALSE, scalebox=.9)
+  caption = "\\tt Wines Dataset Attributes Summary", label = "table:sum_rw"),include.rownames = FALSE, scalebox=.9)
 ```
+
+\newpage 
 
 ## Check for missing values
 The dataset has no missing values. Code below calculate number of rows with missing values and checks if there is at list one.
@@ -182,20 +164,17 @@ any(is.na(wines_data))
 ## Distribution of target value in the dataset
 As we mentioned before, the target value QLT of the wine quality is not equally distributed. The Figure \ref{fig:hist_qlt_rw} demonstrates the distribution. As we can see, dataset covers mostly medium-quality wines with QLT between 5 and 7 well, low and high  quality wines represented poorly.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
-t <- xtable(prop.table((table(wines_data$QLT))),
-  caption = "\\tt Distribution of the target QLT attribute in the original dataset", label = "table:dhead11")
-print(t, include.colnames=F)
+```{r}
+prop.table(table(wines_data$QLT))
 ```
 
-```{r hist_qlt_rw, fig.pos = 'h', fig.height=3, fig.width=5, fig.align="center", fig.cap="Distribution of Wine Quality Attribute"}
+```{r hist_qlt_rw, fig.pos = 'h', fig.height=4, fig.width=5, fig.align="center", fig.cap="Distribution of Wine Quality Attribute"}
 ggplot(data = wines_data, mapping = aes(x = QLT)) + geom_bar()
 ```
 
 ## Splitting the wine into train and test sets
 
 The wines dataset has been split in such a way that train and test sets would have the same distribution of the QLT attribute. We used 70:30 split ratio. 
-
 ```{r message=FALSE, warning=FALSE}
 library(caret)
 cluster1 <- wines_data[,1:12]
@@ -209,9 +188,11 @@ test1.data<- cluster1[-train1.rows,]
 prop.table((table(test1.data$QLT)))
 ```
 
-# Modelling of the wine quality
+# Modelling of the Wine Quality
 
 ## Random Forests Prediction
+
+First we use advanced but computationally demanding Random Forest method \citep{noauthor_random_2018}. Decision trees are a popular method for various machine learning tasks. Tree learning "come[s] closest to meeting the requirements for serving as an off-the-shelf procedure for data mining because it is invariant under scaling and various other transformations of feature values, is robust to inclusion of irrelevant features, and produces inspectable models. However, they are seldom accurate". In particular, trees that are grown very deep tend to learn highly irregular patterns: they overfit their training sets, i.e. have low bias, but very high variance. Random forests are a way of averaging multiple deep decision trees, trained on different parts of the same training set, with the goal of reducing the variance. This comes at the expense of a small increase in the bias and some loss of interpretability, but generally greatly boosts the performance in the final model.
 
 ```{r message=FALSE, warning=FALSE}
 library(randomForest)
@@ -220,9 +201,14 @@ fitRF1 <- randomForest(
   data=train1.data, importance=TRUE, ntree=500)
 ```
 
+Random forests can be used to rank the importance of variables in a regression or classification problem in a natural way. To measure the importance of the j-th feature after training, the values of the j-th feature are permuted among the training data and the out-of-bag error is again computed on this perturbed data set. The importance score for thej-th feature is computed by averaging the difference in out-of-bag error before and after the permutation over all trees. The score is normalized by the standard deviation of these differences.
+Features which produce large values for this score are ranked as more important than features which produce small values. The Figure \ref{fig:forimp} presents this analysi.
+
 ```{r forimp, fig.width=5.5, fig.height=6, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Importance of the dataset attributes for the prediction of the QLT attribute"}
 varImpPlot(fitRF1, main="")
 ```
+
+The accuracy of the RF prediction is calsulated below. Table \ref{table:confMat2} presents re results of the RF analysis in the form of a confusion matrix. The viasual presentation of the calsulations is presented in Figure \ref{fig:plot_rf_rw}.
 
 ```{r}
 PredictionRF1 <- predict(fitRF1, test1.data)
@@ -255,6 +241,9 @@ summary(svm_model)
 ```
 
 ## Run SVM Prediction
+
+The Support Vector Regression (SVR) uses the same principles as the SVM for classification, with only a few minor differences. First of all, because output is a real number it becomes very difficult to predict the information at hand, which has infinite possibilities. In the case of regression, a margin of tolerance (epsilon) is set in approximation to the SVM which would have already requested from the problem. But besides this fact, there is also a more complicated reason, the algorithm is more complicated therefore to be taken in consideration. However, the main idea is always the same: to minimize error, individualizing the hyperplane which maximizes the margin, keeping in mind that part of the error is tolerated.
+
 ```{r}
 predSVM <- predict(svm_model, test1.data)
 cor(predSVM,test1.data$QLT)
@@ -300,14 +289,14 @@ library(neuralnet)
 n <- names(train_)
 f <- as.formula(paste("QLT ~", paste(n[!n %in% "QLT"], collapse = " + ")))
 f
-nn <- neuralnet(f,data=train_,hidden=c(6,3),linear.output=F)
-#nn <- neuralnet(f,data=train_,linear.output=F)
+#nn <- neuralnet(f,data=train_,hidden=c(6,3),linear.output=F)
 ```
 
 The Figure \ref{fig:plot_nn} demostrates the NN model with the weights on each connection.
 
 ```{r plot_nn, echo=TRUE, fig.height=9, fig.width=6, message=FALSE, warning=FALSE, fig.cap="Graphical representation of the NN model with the weights on each connection"}
-plot(nn)
+#plot(nn)
+knitr::include_graphics("images/nn_lg.png")
 ```
 
 
@@ -315,21 +304,43 @@ plot(nn)
 
 NN outputs a normalized prediction, so we need to scale it back in order to make a meaningful comparison (or just a simple prediction)
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 pr.nn <- compute(nn,test_[,1:11])
 pr.nn_ <- pr.nn$net.result*(max(data$QLT)-min(data$QLT))+min(data$QLT)
 test.r <- (test_$QLT)*(max(data$QLT)-min(data$QLT))+min(data$QLT)
-#MSE.nn <- sum((test.r - pr.nn_)^2)/nrow(test_)
 cor(test.r,pr.nn_)
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE, results='asis'}
 xtable(table(round(pr.nn_),as.factor(test.r)), caption = "\\tt NN Pledictor Confusion Matrix", label = "table:confMat4")
 ```
 
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrrrr}
+  \hline
+ & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ 
+  \hline
+4 &   0 &   2 &   5 &   0 &   0 &   0 &   0 \\ 
+  5 &   8 &  28 & 336 & 189 &  10 &   0 &   0 \\ 
+  6 &   1 &  13 & 179 & 456 & 137 &  19 &   0 \\ 
+  7 &   0 &   0 &   6 &  97 & 115 &  21 &   2 \\ 
+   \hline
+\end{tabular}
+\caption{\tt NN Pledictor Confusion Matrix} 
+\label{table:confMat4}
+\end{table}
 
+```
 
-```{r plot_rf2_rw, fig.width=8, fig.height=5, fig.align="center", message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="SVM Prediction"}
+## [1] 0.6043741164
+```
+
+```{r fig.align = "center", out.width = "1\\textwidth"}
+knitr::include_graphics("images/nn_scatter.png")
+```
+
+```{r plot_rf2_rw, eval=FALSE, fig.align="center", fig.cap="SVM Predictor Scatter Plot", fig.height=5, fig.width=8, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
 library(ggplot2)
 df2 = data.frame(as.factor(test.r), pr.nn_)
 colnames(df2) <- c("Test","Prediction")
@@ -338,7 +349,11 @@ ggplot(df2, aes(x = Test, y = Prediction)) +
         geom_jitter(width = 0.25, pch=20, col=rgb(0.1, 0.2, 0.8, 0.3))
 ```
 
+## Can we Guess Wine Type by its Biochemical Content?
 
+```{r fig.align = "center", out.width = "0.75\\textwidth"}
+knitr::include_graphics("images/vinho-verde-wine-region-20.jpg")
+```
 
 ## Preparation for cluster analysis
 
@@ -347,7 +362,11 @@ ggplot(df2, aes(x = Test, y = Prediction)) +
 Normalizing wine dataset in preparation for clustering
 ```{r}
 wines_data.std <- scale(wines_data[1:11])
-head(wines_data.std)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
+print(xtable(summary(head(wines_data.std[,1:6]))), include.rownames = FALSE, scalebox=1)
+print(xtable(summary(head(wines_data.std[,7:11]))),include.rownames = FALSE, scalebox=1)
 ```
 
 ### Determine optimal number of clusters
@@ -375,11 +394,10 @@ The problem is computationally difficult (NP-hard), k-means clustering tends to 
 
 Resulting cluster centers are presented in Table \ref{table:kcent1}.
 
-```{r  fig.height=10, fig.width=10}
+```{r}
 set.seed(420)
 clusters_num = 3
 k.means.fit <- kmeans(wines_data.std, clusters_num,iter.max = 1000)
-k.means.fit$size
 ```
 
 
@@ -478,13 +496,17 @@ xtable(centers,
 \newpage
 
 # Conclusion
-Through exploring the Red Wine Quality dataset and using a different methods of Linear Regression we developed an algorithm to predict the wine quality using its chemical characteristics.
+Through exploring the Wine Quality dataset we developed an algorithm to predict the wine quality using its chemical characteristics and extracted some interesting information about the wines presented. 
 
-First we applied the Linear Regression OLS method and through several steps of correcting the model and adjusting for skewness and then comparing it to automated Stepwise Regression method we achieved the accuracy of RT at 0.5480833 is 50% higher than OLS. 
+First we applied the Random Forest Regresson methos and achieved accuracy of predicting wine quality of 72%. The method has shown that the most important attriutes that influence the quality estimation of wines by human experts are alcohol (ALC), volatile acidity (VA) and free sulfur dioxide (FSD). The RF method showed low precision in the area of poor and high quality wines. 
 
-Next we  applied tree-based regression methods. First we used a Regression Tree which gave us accuracy of 0.5480833. The final method was the Random Forest Regressor and achieved 80% better accuracy at 0.6734 comparing  to OLS. 
+Next we applied a Support Vector Machine Regression method (SVM) and achieved accuracy of 62, lower than RF, but the precision in the area of poor and high quality wines increased at least 20%.
 
-The project was a success, however, none of the Linear Regression methods used would give us reliable precision. All the plots show the presence of outliers and inaccuracy in the areas of low and high scores. We conclude that the current problem could not be solved by the Linear Regression methods only, it looks that additional methods like Clustering is required to split the dataset into smaller sets to satisfy Linear Regression limitations.
+Next we applied we applied a Neural Networks (NN) regression cofigured with 11:6:3:1 layers and achieved overall accuracy of 60%, lower than both RF and SVM. Interestingly, the precision of NN in the area of poor and high quality wines was almost 10% higher than SVM, making NN the best method in quality prediction of the most interesting and least presented sector of wines in the dataset.
+
+Finally we applied Cluster Analysis (CA) to investigate if we could predict the quality better or if we could get any new knowledge from the dataset. We discovered that there is no correlation between wine quality and biochemical data from the CA point of view. On the other hand, there is a strong correlation between clusters and wine types. Even though the information about influence of 11 chemical characteristics on the taste of wine is very limited, we discovered clusters that contain such types of wine as white sweet, white dry, rose and old dry red. We can add that more subtypes of wine were discovered, but it is diffucult to give them specific names using only the dataset at hand.
+
+The project was a success. Next steps would be collecting more information about relation of the base chemical component on the wine taste and finding datasets with additional wine attributes, related more to the human interpretation of wines, and connets those datasets with the one used in the project.
 
 \bibliography{RJreferences}
 
