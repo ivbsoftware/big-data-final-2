@@ -169,7 +169,7 @@ ggplot(data = wines_data, mapping = aes(x = QLT)) + geom_bar()
 
 The Figure \ref{fig:dist1} demonstrates correlation of the most important "taste" attribute to the quality of the wines. As we can see from those charts, there is no direct correlation of any single attribute. Either they work in combination, or the dataset is missing important characteristics that affect human perception of the wine taste. 
 
-```{r dist1, echo=FALSE, fig.align="center", fig.cap="Correlation of QLT to the \"taste\" sttributes", fig.height=9, fig.width=5.5, paged.print=FALSE}
+```{r dist1, echo=FALSE, fig.align="center", fig.cap="Correlation of QLT to the \"taste\" attributes", fig.height=9, fig.width=5.5, paged.print=FALSE}
 library(ggplot2)
 df2 = data.frame(as.factor(wines_data$QLT), wines_data$VA)
 colnames(df2) <- c("QLT","VA")
@@ -275,7 +275,7 @@ cor(predSVM,test1.data$QLT)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE, results='asis'}
-xtable(table(round(predSVM),test1.data$QLT), caption = "\\tt SVM Pledictor Confusion Matrix", label = "table:confMat3")
+xtable(table(round(predSVM),test1.data$QLT), caption = "\\tt SVR Predictor Confusion Matrix", label = "table:confMat3")
 ```
 
 ```{r plot_rf1_rw, echo=FALSE, fig.align="center", fig.cap="SVM Prediction", fig.height=4, fig.width=5.5, message=FALSE, warning=FALSE, paged.print=FALSE}
@@ -393,10 +393,10 @@ ggplot(df2, aes(x = Test, y = Prediction)) +
 
 # Cluster Analysis
 
-The modeling of the wine quality does not answer many important questions. We eill attempt to answer two of them in this report:
+The modeling of the wine quality does not answer many important questions. We will attempt to answer two of them in this report:
 
-- Was the dataset was properly labeled by human experts? Is there a bios here?
-- can we guess wine type by its physicochemical content (Fig \ref{fig:wines})?
+- Was the dataset properly labeled by human experts? Is there a bios here?
+- Can we guess wine type by its physicochemical content (Fig \ref{fig:wines})?
 
 To answer those questions we will apply Clustering Analysis. Cluster is a collection of data objects similar to one another within the same cluster, dissimilar to the objects in other clusters. Cluster analysis is grouping a set of data objects into clusters. Clustering is unsupervised classification, no predefined classes assumed.
 
@@ -410,7 +410,7 @@ knitr::include_graphics("images/vinho-verde-wine-region-20.jpg")
 
 ### Wines dataset normalizing
 
-Normalizing wine dataset in preparation for clustering is done with help of the code below. The statistical characteristics of the attributes after the normalizing presented in 
+Normalizing wine dataset in preparation for clustering is done with help of the code below. The statistical characteristics of the attributes after the normalizing presented in Table \ref{table:sum_rw}.
 ```{r}
 wines_data.std <- scale(wines_data[1:11])
 ```
