@@ -278,7 +278,7 @@ cor(predSVM,test1.data$QLT)
 xtable(table(round(predSVM),test1.data$QLT), caption = "\\tt SVR Predictor Confusion Matrix", label = "table:confMat3")
 ```
 
-```{r plot_rf1_rw, echo=FALSE, fig.align="center", fig.cap="SVM Prediction", fig.height=4, fig.width=5.5, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r plot_rf1_rw, echo=FALSE, fig.align="center", fig.cap="SVR Prediction", fig.height=4, fig.width=5.5, message=FALSE, warning=FALSE, paged.print=FALSE}
 library(ggplot2)
 df2 = data.frame(as.factor(test1.data$QLT), predSVM)
 colnames(df2) <- c("Test","Prediction")
@@ -444,7 +444,7 @@ The diagram presented in Figure \ref{fig:elbow} demonstrates the calculated 'elb
 
 ## Clustering using K-means method
 
-k-means clustering \citep{noauthor_k-means_2018} is a method of vector quantization, which is popular for cluster analysis in data mining. k-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. This results in a partitioning of the data space into Voronoi cells \citep{noauthor_nouvelles_1908}.
+k-means clustering \citep{k_means_2018} is a method of vector quantization, which is popular for cluster analysis in data mining. k-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. This results in a partitioning of the data space into Voronoi cells \citep{noauthor_nouvelles_1908}.
 
 The problem is computationally difficult (NP-hard), k-means clustering tends to find clusters of comparable spatial extent, while the expectation-maximization mechanism allows clusters to have different shapes. 
 
@@ -478,7 +478,7 @@ clusplot(wines_data.std, k.means.fit$cluster, main='',
          labels=clusters_num, lines=0)
 ```
 
-## Explain Cluters by Wine Quality
+## Explain Clusters by Wine Quality
 
 Let's try to explain clusters by the wine quality. Code below builds a matrix when columns are cluster numbers and rows are wine types. As we can see, quality does not explain clusters, it's evenly distributed among them.
 QLT does not explain clusters, see Table \ref{table:clust_qlt}.
@@ -517,7 +517,10 @@ dh.rescale <- xtable(data.frame(Difference),
 print(dh.rescale, scalebox=1)
 ```
 
-The table shows that clusters 1 and 2 are mostly  differ in sweetness (RS), viscosity (DEN) and alcohol content (ALC). This make cluster 1 sweet white wine group and cluster 2 contains dry white wines.
+The table shows that clusters 1 and 2 are mostly  differ in sweetness (RS), viscosity (DEN) and alcohol content (ALC). This makes: 
+
+ - Cluster 1 is sweet white wines group
+ - Cluster 2 contains dry white wines
 
 \newpage 
 
@@ -562,10 +565,10 @@ print(dh.rescale, scalebox=1)
 
 What's the difference between red wines 3 and 4? Looking at the most important attributes difference and relying on the explanation how thosw chemicals affect the wine taste and taking into account information we discovered about Vihno Verde wines we can conclude that:
 
-- Cluster 3 - contains young fruity sour red wines
+- Cluster 3 - contains young fruity sour rose wines
 - Cluster 4 - contains old red wines with a bit of bitterness
 
-Unfortunately, lack of more specific information about connection of physicochemical components on the wine taste, this is the most that we could conclude from the cluster analysis. The dataset is missing some important attributes that would help us to cluster wines and predict the quality more reliably.
+Unfortunately, lack of more specific information about connection of physicochemical components to the wine taste, this is the most that we could conclude from the cluster analysis. The dataset is missing some important attributes that would help us to cluster wines and predict the quality more reliably.
 
 \newpage
 
@@ -576,7 +579,7 @@ First we applied the Random Forest Regression method and achieved accuracy of pr
 
 Next we applied a Support Vector Regression method (SVR) and achieved accuracy of 62, lower than RF, but the precision in the area of poor and high quality wines increased at least 20%.
 
-Next we applied a Neural Networks (NN) regression cofigured with 11:6:3:1 layers and achieved overall accuracy of 60%, lower than both RF and SVM. Interestingly, the precision of NN in the area of poor and high quality wines was almost 10% higher than SVM, making NN the best method in quality prediction of the most interesting and least presented sector of wines in the dataset.
+Next we applied a Neural Networks (NN) regression cofigured with 11:6:3:1 layers and achieved overall accuracy of 60%, lower than both RF and SVR. Interestingly, the precision of NN in the area of poor and high quality wines was almost 10% higher than SVR, making NN the best method in quality prediction of the most interesting and least presented sector of wines in the dataset.
 
 Finally, we applied Cluster Analysis (CA) to investigate if we could predict the quality better or if we could get any new knowledge from the dataset. We discovered that there is no correlation between wine quality and biochemical data from the CA point of view. On the other hand, there is a strong correlation between clusters and wine types. Even though the information about influence of 11 chemical characteristics on the taste of wine is very limited, we discovered clusters that contain such types of wine as white sweet, white dry, rose and old dry red. We can add that more subtypes of wine were discovered, but it is difficult to give them specific names using only the dataset at hand.
 
