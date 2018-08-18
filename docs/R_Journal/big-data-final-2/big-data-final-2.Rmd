@@ -75,7 +75,7 @@ Input variables (based on physicochemical tests):
 
 Output variable (based on sensory data): 
   12 - quality, based on sensory data (score between 0 and 10) - (QLT)
-  13 - wine type (0 - red whine, 1 - white wine)
+  13 - wine type (0 - red wine, 1 - white wine)
 ```
 
 Let's try to make sense of those attributes. There are many so called "impact compounds" in wine defining its taste and smell. Some of them are obvious, like ALC, DEN and RS. Some of them are really bizarre \citep{noauthor_weird_2017}. The chemical components mentioned in the list have the following influence on the wine taste.
