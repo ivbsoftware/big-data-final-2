@@ -15,7 +15,7 @@ author:
     affiliation   : "York University School of Continuing Studies"
     email         : "https://learn.continue.yorku.ca/user/profile.php?id=21219"
 abstract: >
-  Wine classification is a difficult task since taste is the least understood of the human senses. In this research we propose a data mining approach to predict human wine taste preferences that is based on easily available analytical tests at the wine certification step. We are using a dataset related to red and white Vinho Verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests. The classes are not balanced, there are much more normal wines than excellent or poor ones. The methods used to solve the problem are Random Forests, Clustering, Neural Networks and Support Vector Machine. Results of those methods applicaion are compared and analyzed.
+  Wine classification is a difficult task since taste is the least understood of the human senses. In this research we propose a data mining approach to predict human wine taste preferences that is based on easily available analytical tests at the wine certification step. We are using a dataset related to red and white Vinho Verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests. The classes are not balanced, there are much more normal wines than excellent or poor ones. The methods used to solve the problem are Random Forest, Clustering, Neural Networks and Support Vector Machine. Results of these methods are compared and analyzed.
 output:
   rticles::rjournal_article:
     includes:
@@ -49,7 +49,7 @@ are complex and still not fully understood \citep{legin_evaluation_2003}.
 
 ## Objective
 
-The objective of this project is is to provide a reliable and feasible recommendation algorithm to predict wine quality based on physicochemical tests.  The target value is a numeric value of wine 'quality', hence the task could be solved by several regression methods, like Random Forest, Support Vector Machines and Neural Networks. In addition, it was decided to apply Clustering Analysis to investigate if we could predict the quality better or if we could get any new knowledge from the dataset.
+The objective of this project is to provide a reliable and feasible recommendation algorithm to predict wine quality based on physicochemical tests.  The target value is a numeric value of wine 'quality', hence the task could be solved by several regression methods; like Random Forest, Support Vector Machines and Neural Networks. In addition, it was decided to apply Clustering Analysis to investigate if we could predict the quality better or if we could get any new knowledge from the dataset.
 
 \newpage
 
@@ -90,12 +90,12 @@ In wine tasting, the general term “acidity” defined by pH, FA and CA, refers
 
 Sulfates (SUL) aren't involved in wine production, but some beer makers use calcium sulfate—also known as brewers' gypsum—to correct mineral deficiencies in water during the brewing process. Sulfites are naturally occurring compounds found in all wines; they act as a preservative by inhibiting microbial growth. 
 
-The amount of CH in wine is influenced by both the terroir and type of grape \citep{coli_chloride_2015}, and the importance of quantification lies in the fact that wine flavor is strongly impacted by this particular ion, which, in high concentration, gives the wine an undesirable salty taste.
+The amount of CH in wine is influenced by both the terroir and type of grape \citep{coli_chloride_2015}, and the importance of quantification lies in the fact that wine flavor is strongly impacted by this particular ion, which in high concentration, gives the wine an undesirable salty taste.
 
 \newpage
 
 ## Data Preparation
-To perform the analysis, certain R libraries were used. The code below was used to load and initialize the librarie, then loads the data.  To pretty-print the tables in this report we used xtable \citep{R-xtable} library.
+To perform the analysis, certain R libraries were used. The code below was used to load and initialize the library, then loads the data.  To pretty-print the tables in this report we used xtable \citep{R-xtable} library.
 
 ```{r message=FALSE, warning=FALSE}
 set.seed(42)
@@ -156,7 +156,7 @@ print(xtable(summary(wines_data[,7:12]),
 \newpage 
 
 ## Distribution of values in the dataset
-As it was mentioned before, the target value QLT of the wine quality is not equally distributed. The Figure \ref{fig:hist_1} demonstrates the distribution. As we can see, dataset covers mostly medium-quality wines with QLT between  5 and 7 well, low and high  quality wines represented poorly. Code below calculates this distribution.
+As previously mentioned, the target value QLT of the wine quality is not equally distributed. The Figure \ref{fig:hist_1} demonstrates the distribution. As we can see, dataset covers mostly medium-quality wines with QLT between 5 and 7 well, low and high  quality wines represented poorly. Code below calculates this distribution.
 
 ```{r}
 print(prop.table(table(wines_data$QLT)), digits = 4)
@@ -167,7 +167,7 @@ ggplot(data = wines_data, mapping = aes(x = QLT)) + geom_bar()
 
 ```
 
-The Figure \ref{fig:dist1} demonstrates correlation of the most important "taste" attribute to the quality of the wines. As we can see from those charts, there is no direct correlation of any single attribute. Either they work in combination, or the dataset is missing important characteristics that affect human perception of the wine taste. 
+The Figure \ref{fig:dist1} demonstrates correlation of the most important "taste" attribute to the quality of the wines. As we can see from those charts, there is no direct correlation of any single attribute. Either they work in combination or the dataset is missing important characteristics that affect human perception of the wine taste. 
 
 ```{r dist1, echo=FALSE, fig.align="center", fig.cap="Correlation of QLT to the \"taste\" attributes", fig.height=9, fig.width=5.5, paged.print=FALSE}
 library(ggplot2)
@@ -223,7 +223,7 @@ test1.data<- cluster1[-train1.rows,]
 
 ## Random Forests Prediction
 
-First we use advanced but computationally demanding Random Forest method \citep{noauthor_random_2018}. Decision trees are a popular method for various machine learning tasks. Tree learning "come[s] closest to meeting the requirements for serving as an off-the-shelf procedure for data mining because it is invariant under scaling and various other transformations of feature values, is robust to inclusion of irrelevant features, and produces inspectable models. However, they are seldom accurate". In particular, trees that are grown very deep tend to learn highly irregular patterns: they overfit their training sets, i.e. have low bias, but very high variance. Random forests are a way of averaging multiple deep decision trees, trained on different parts of the same training set, with the goal of reducing the variance. This comes at the expense of a small increase in the bias and some loss of interpretability, but generally greatly boosts the performance in the final model.
+First we use advanced but computationally demanding Random Forest method \citep{noauthor_random_2018}. Decision trees are a popular method for various machine learning tasks. Tree learning "come[s] closest to meeting the requirements for serving as an off-the-shelf procedure for data mining because it is invariant under scaling and various other transformations of feature values, is robust to inclusion of irrelevant features, and produces inspectable models. However, they are seldom accurate". In particular, trees that are grown very deep tend to learn highly irregular patterns: they overfit their training sets, i.e. have low bias, but very high variance. Random Forests are a way of averaging multiple deep decision trees, trained on different parts of the same training set, with the goal of reducing the variance. This comes at the expense of a small increase in the bias and some loss of interpretability but generally greatly boosts the performance in the final model.
 
 ```{r message=FALSE, warning=FALSE}
 library(randomForest)
@@ -232,7 +232,7 @@ fitRF1 <- randomForest(
   data=train1.data, importance=TRUE, ntree=500)
 ```
 
-Random forests can be used to rank the importance of variables in a regression or classification problem in natural way. To measure the importance of the j-th feature after training, the values of the j-th feature are permuted among the training data and the out-of-bag error is again computed on this perturbed data set. The score is normalized by the standard deviation of these differences.
+Random Forest can be used to rank the importance of variables in a regression or classification problem in natural way. To measure the importance of the j-th feature after training, the values of the j-th feature are permuted among the training data and the out-of-bag error is again computed on this perturbed data set. The score is normalized by the standard deviation of these differences.
 
 Features which produce large values for this score are ranked as more important than features which produce small values. The Figure \ref{fig:forimp} presents this analysis. As we can see, the most important chemicals influencing the wine taste are ALC, VA. Next come SUL and FSD.
 
@@ -263,7 +263,7 @@ ggplot(df2, aes(x = Test, y = Prediction)) +
 
 ## Support Vector Regression
 
-The Support Vector Regression (SVR) uses the same principles as the SVM for classification, with only a few minor differences. First of all, because output is a real number it becomes very difficult to predict the information at hand, which has infinite possibilities. In the case of regression, a margin of tolerance (epsilon) is set in approximation to the SVM which would have already requested from the problem. But besides this fact, there is also a more complicated reason, the algorithm is more complicated therefore to be taken in consideration. However, the main idea is always the same: to minimize error, individualizing the hyperplane which maximizes the margin, keeping in mind that part of the error is tolerated.
+The Support Vector Regression (SVR) uses the same principles as the SVM for classification with only a few minor differences. First of all, because output is a real number it becomes very difficult to predict the information at hand, which has infinite possibilities. In the case of regression, a margin of tolerance (epsilon) is set in approximation to the SVM which would have already requested from the problem. But besides this fact, there is also a more complicated reason, the algorithm is more complicated therefore to be taken in consideration. However, the main idea is always the same: to minimize error, individualizing the hyperplane which maximizes the margin, keeping in mind that part of the error is tolerated.
 
 Code below runs the SVR prediction and evaluates its accuracy. As we can see from the Table \ref{table:confMat3} and Figure \ref{fig:plot_rf1_rw}, the accuracy is about 63%, almost 10% less than accuracy of the RF prediction, but the prediction of QLT for the high quality wines increase almost 10%.
 
@@ -309,7 +309,7 @@ test_ <- scaled[-index,]
 ```
 
 ### NN model
-The R "neuralnet"" package is used for this task in the report \citep{noauthor_fitting_nodate}. Code below creates the NN model and trains it using the train set. Figure \ref{fig:plot_nn} demonstrates the NN model with the weights on each connection used for calculations.
+The R "neuralnet" package is used for this task in the report \citep{noauthor_fitting_nodate}. Code below creates the NN model and trains it using the train set. Figure \ref{fig:plot_nn} demonstrates the NN model with the weights on each connection used for calculations.
 
 ```
 library(neuralnet)
@@ -423,7 +423,7 @@ print(xtable(summary(head(wines_data.std[,7:11])),
 
 ### Determine optimal number of clusters
 First we need to determine number of clusters. 
-Looking at the percentage of variance explained as a function of the number of clusters, we should choose a number of clusters in order to ensure that too much modeling of the data is not given. More precisely, if one plots the percentage of variance explained by the clusters against the number of clusters, the first clusters will add much more information (explains a lot of variance); but at some point, the marginal gain will drop, giving an angle in the graph. The number of clusters is chosen at this point. 
+Looking at the percentage of variance explained as a function of the number of clusters, we should choose a number of clusters in order to ensure that too much modeling of the data is not given. More precisely, if one plots the percentage of variance explained by the clusters against the number of clusters, the first clusters will add much more information (explains a lot of variance); although at some point, the marginal gain will drop, giving an angle in the graph. The number of clusters is chosen at this point. 
 
 This method is called the 'elbow criterion'. The code below calculated and prints the "Elbow Criterion Diagram":
 
@@ -480,7 +480,7 @@ clusplot(wines_data.std, k.means.fit$cluster, main='',
 
 ## Explain Clusters by Wine Quality
 
-Let's try to explain clusters by the wine quality. Code below builds a matrix when columns are cluster numbers and rows are wine types. As we can see, quality does not explain clusters, it's evenly distributed among them.
+Let's try to explain clusters by the wine quality. Code below builds a matrix when columns are cluster numbers and rows are wine types. As we can see quality does not explain clusters, it's evenly distributed among them.
 QLT does not explain clusters, see Table \ref{table:clust_qlt}.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
@@ -517,7 +517,7 @@ dh.rescale <- xtable(data.frame(Difference),
 print(dh.rescale, scalebox=1)
 ```
 
-The table shows that clusters 1 and 2 are mostly  differ in sweetness (RS), viscosity (DEN) and alcohol content (ALC). This makes: 
+The table shows that clusters 1 and 2 are mostly differ in sweetness (RS), viscosity (DEN) and alcohol content (ALC). This makes: 
 
  - Cluster 1 is sweet white wines group
  - Cluster 2 contains dry white wines
@@ -563,7 +563,7 @@ dh.rescale <- xtable(data.frame(Difference),
 print(dh.rescale, scalebox=1)
 ```
 
-What's the difference between red wines 3 and 4? Looking at the most important attributes difference and relying on the explanation how thosw chemicals affect the wine taste and taking into account information we discovered about Vihno Verde wines we can conclude that:
+What's the difference between red wines 3 and 4? Looking at the most important attributes difference and relying on the explanation how those chemicals affect the wine taste and taking into account information we discovered about Vihno Verde wines we can conclude that:
 
 - Cluster 3 - contains young fruity sour rose wines
 - Cluster 4 - contains old red wines with a bit of bitterness
@@ -579,9 +579,9 @@ First we applied the Random Forest Regression method and achieved accuracy of pr
 
 Next we applied a Support Vector Regression method (SVR) and achieved accuracy of 62, lower than RF, but the precision in the area of poor and high quality wines increased at least 20%.
 
-Next we applied a Neural Networks (NN) regression cofigured with 11:6:3:1 layers and achieved overall accuracy of 60%, lower than both RF and SVR. Interestingly, the precision of NN in the area of poor and high quality wines was almost 10% higher than SVR, making NN the best method in quality prediction of the most interesting and least presented sector of wines in the dataset.
+Further to this, we applied a Neural Networks (NN) regression cofigured with 11:6:3:1 layers and achieved overall accuracy of 60%, lower than both RF and SVR. Interestingly, the precision of NN in the area of poor and high quality wines was almost 10% higher than SVR, making NN the best method in quality prediction of the most interesting and least presented sector of wines in the dataset.
 
-Finally, we applied Cluster Analysis (CA) to investigate if we could predict the quality better or if we could get any new knowledge from the dataset. We discovered that there is no correlation between wine quality and biochemical data from the CA point of view. On the other hand, there is a strong correlation between clusters and wine types. Even though the information about influence of 11 chemical characteristics on the taste of wine is very limited, we discovered clusters that contain such types of wine as white sweet, white dry, rose and old dry red. We can add that more subtypes of wine were discovered, but it is difficult to give them specific names using only the dataset at hand.
+Finally, we applied Cluster Analysis (CA) to investigate if we could predict the quality better or if we could get any new knowledge from the dataset. We discovered that there is no correlation between wine quality and biochemical data from the CA point of view. On the other hand, there is a strong correlation between clusters and wine types. Even though the information about influence of 11 chemical characteristics on the taste of wine is very limited; we discovered clusters that contain such types of wine as white sweet, white dry, rose and old dry red. We can add that more subtypes of wine were discovered but it is difficult to give them specific names using only the dataset at hand.
 
 The project was a success. Next steps would be collecting more information about relation of the base chemical component on the wine taste and finding datasets with additional wine attributes, related more to the human interpretation of wines, and connects those datasets with the one used in the project.
 
