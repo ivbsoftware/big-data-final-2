@@ -221,9 +221,9 @@ train1.data<- cluster1[train1.rows,]
 test1.data<- cluster1[-train1.rows,]
 ```
 
-## Random Forests Prediction
+## Random Forest Prediction
 
-First we use advanced but computationally demanding Random Forest method \citep{noauthor_random_2018}. Decision trees are a popular method for various machine learning tasks. Tree learning "come[s] closest to meeting the requirements for serving as an off-the-shelf procedure for data mining because it is invariant under scaling and various other transformations of feature values, is robust to inclusion of irrelevant features, and produces inspectable models. However, they are seldom accurate". In particular, trees that are grown very deep tend to learn highly irregular patterns: they overfit their training sets, i.e. have low bias, but very high variance. Random Forests are a way of averaging multiple deep decision trees, trained on different parts of the same training set, with the goal of reducing the variance. This comes at the expense of a small increase in the bias and some loss of interpretability but generally greatly boosts the performance in the final model.
+First we use advanced but computationally demanding Random Forest method \citep{noauthor_random_2018}. Decision trees are a popular method for various machine learning tasks. Tree learning "come[s] closest to meeting the requirements for serving as an off-the-shelf procedure for data mining because it is invariant under scaling and various other transformations of feature values, is robust to inclusion of irrelevant features, and produces inspectable models. However, they are seldom accurate". In particular, trees that are grown very deep tend to learn highly irregular patterns: they overfit their training sets, i.e. have low bias, but very high variance. Random Forest are a way of averaging multiple deep decision trees, trained on different parts of the same training set, with the goal of reducing the variance. This comes at the expense of a small increase in the bias and some loss of interpretability but generally greatly boosts the performance in the final model.
 
 ```{r message=FALSE, warning=FALSE}
 library(randomForest)
