@@ -444,7 +444,7 @@ The diagram presented in Figure \ref{fig:elbow} demonstrates the calculated 'elb
 
 ## Clustering using K-means method
 
-k-means clustering \citep{k_means_2018} is a method of vector quantization, which is popular for cluster analysis in data mining. k-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. This results in a partitioning of the data space into Voronoi cells \citep{noauthor_nouvelles_1908}.
+k-means clustering \citep{k_means_2018} is a method of vector quantization, which is popular for cluster analysis in data mining. k-means clustering aims to partition n observations into k clusters in which each observation belongs to the cluster with the nearest mean, serving as a prototype of the cluster. This results in a partitioning of the data space into Voronoi cells.
 
 The problem is computationally difficult (NP-hard), k-means clustering tends to find clusters of comparable spatial extent, while the expectation-maximization mechanism allows clusters to have different shapes. 
 
